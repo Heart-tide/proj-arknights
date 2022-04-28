@@ -12,12 +12,11 @@ namespace Ui {
 class Reunion;
 }
 
-class Reunion : public Infected
-{
+class Reunion : public Infected {
     Q_OBJECT
 
 public:
-    explicit Reunion(QWidget *parent = nullptr);
+    explicit Reunion(QWidget* parent = nullptr);
     explicit Reunion(Place* place, size_t deployment_time);
     ~Reunion();
 
@@ -27,12 +26,12 @@ public:
     static constexpr bool is_flying = false;
 
 protected:
-    bool is_blocked;
-    size_t move_speed; //* 每tick移动的长度
-    vector<Place*> route;
+    bool _is_blocked;
+    size_t _move_speed; //* 每tick移动的长度
+    vector<Place*> _route;
 
 private:
-    Ui::Reunion *ui;
+    Ui::Reunion* ui;
 };
 
 #endif // REUNION_H

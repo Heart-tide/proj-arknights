@@ -26,8 +26,8 @@ public:
     virtual void removeOperator(Operator* op) { _op = nullptr; }
     virtual void removeReunion(Reunion* reunion);
 
-    static constexpr bool is_base = false;
-    static constexpr bool is_entrance = false;
+    virtual bool is_base() { return false; }
+    virtual bool is_entrance() { return false; }
 
 protected:
     Operator* _op;
@@ -60,7 +60,7 @@ public:
 
     void addReunion(Reunion* reunion) override { }
 
-    static constexpr bool is_base = true;
+    bool is_base() override { return true; }
 };
 
 class Entrance : public UnreachablePlace {
@@ -72,7 +72,7 @@ public:
 
     void addReunion(Reunion* reunion) override;
 
-    static constexpr bool is_entrance = true;
+    bool is_entrance() override { return true; }
 
 private:
 };

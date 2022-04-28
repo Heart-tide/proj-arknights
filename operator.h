@@ -8,12 +8,11 @@ namespace Ui {
 class Operator;
 }
 
-class Operator : public Infected
-{
+class Operator : public Infected {
     Q_OBJECT
 
 public:
-    explicit Operator(QWidget *parent = nullptr);
+    explicit Operator(QWidget* parent = nullptr);
     explicit Operator(Place* place, size_t deployment_time);
     ~Operator();
 
@@ -23,11 +22,10 @@ public:
     static constexpr size_t cost = 12;
 
 protected:
-    size_t block;
+    size_t _block;
 
 private:
-    Ui::Operator *ui;
+    Ui::Operator* ui;
 };
-
 
 #endif // OPERATOR_H

@@ -40,8 +40,8 @@ public:
     Map(vector<Line*> lines);
     ~Map();
 
-    Line*& operator[](size_t i) { return _lines[i]; }
-    const Line* operator[](size_t i) const { return _lines[i]; }
+    Line& operator[](size_t i) { return *_lines[i]; }
+    const Line& operator[](size_t i) const { return *_lines[i]; }
 
     void addLine(Line* line);
     void loadMap();

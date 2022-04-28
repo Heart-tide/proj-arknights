@@ -5,13 +5,12 @@
 
 class Place;
 
-class Infected : public QWidget
-{
+class Infected : public QWidget {
     Q_OBJECT
 
 public:
-    explicit Infected(QWidget *parent = nullptr);
-    explicit Infected(Place* place, size_t deployment_time);
+    explicit Infected(QWidget* parent = nullptr);
+    Infected(Place* place, size_t deployment_time);
     virtual ~Infected();
 
     void reduceHealth();
@@ -22,11 +21,11 @@ public:
     static constexpr size_t cost = 0;
 
 protected:
-    size_t health;
-    int damage;
-    size_t attack_interval; //* 连续两次攻击的间隔tick数
-    Place* place;
-    size_t deployment_time;
+    size_t _health;
+    int _damage;
+    size_t _attack_interval; //* 连续两次攻击的间隔tick数
+    Place* _place;
+    size_t _deployment_time;
 };
 
 #endif // INFECTED_H

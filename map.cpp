@@ -61,8 +61,8 @@ void Map::addLine(Line* line)
 void Map::loadMap()
 {
     //* 一阶段测试地图，从右上到左下
-    _lines[0]->operator[](giveWidth() - 1) = _entrance;
-    _lines[giveHeight() - 1]->operator[](0) = _base;
+    (*this)[0][giveWidth() - 1] = _entrance;
+    (*this)[giveHeight() - 1][0] = _base;
 }
 
 void Map::loadRoutes()
@@ -73,10 +73,10 @@ void Map::loadRoutes()
     size_t height = giveHeight();
     vector<Place*> route;
     for (size_t i = height - 1; i != 0; i--) {
-        route.push_back(_lines[i]->operator[](0));
+        route.push_back((*this)[i][0]);
     }
     for (size_t i = 1; i != width; i++) {
-        route.push_back(_lines[0]->operator[](i));
+        route.push_back((*this)[0][i]);
     }
 }
 
