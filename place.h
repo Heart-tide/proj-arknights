@@ -1,10 +1,14 @@
 #ifndef PLACE_H
 #define PLACE_H
 
+#include <QString>
 #include <QWidget>
+#include <map>
 #include <vector>
+using std::pair;
 using std::vector;
 
+class Map;
 class Infected;
 class Operator;
 class Reunion;
@@ -18,6 +22,8 @@ class Place : public QWidget {
     Q_OBJECT
 
 public:
+    friend class Map;
+
     Place();
     virtual ~Place();
 
@@ -28,10 +34,12 @@ public:
 
     virtual bool is_base() { return false; }
     virtual bool is_entrance() { return false; }
+    QString giveId() const;
 
 protected:
     Operator* _op;
     vector<Reunion*> _reunions;
+    pair<size_t, size_t> _id;
 
 private:
     Ui::Place* ui;
@@ -39,38 +47,22 @@ private:
 
 //************* Place有三个子类：不可到达的地块、低地、高地 *************
 
-//* 这里是不可到达地块
-class UnreachablePlace : public Place {
-public:
-    UnreachablePlace() = default;
-    ~UnreachablePlace() = default;
-
-    void addOperator(Operator* op) override;
-    void addReunion(Reunion* reunion) override;
-    void removeOperator(Operator* op) override;
-    void removeReunion(Reunion* reunion) override;
-};
-
-class Base : public UnreachablePlace {
+class Base : public Place {
     Q_OBJECT
 
 public:
     Base() = default;
     ~Base() = default;
 
-    void addReunion(Reunion* reunion) override { }
-
     bool is_base() override { return true; }
 };
 
-class Entrance : public UnreachablePlace {
+class Entrance : public Place {
     Q_OBJECT
 
 public:
     Entrance() = default;
     ~Entrance() = default;
-
-    void addReunion(Reunion* reunion) override;
 
     bool is_entrance() override { return true; }
 

@@ -1,26 +1,32 @@
 #include "infected.h"
 
-Infected::Infected(QWidget* parent)
+Infected::Infected()
+    : _max_health(0)
+{
+}
+
+Infected::Infected(size_t health, int damage, size_t attack_interval,
+    Place* place, size_t deployment_time, size_t id, QWidget* parent)
     : QWidget(parent)
+    , _health(health)
+    , _max_health(health)
+    , _damage(damage)
+    , _attack_interval(attack_interval)
+    , _last_attack_time(deployment_time)
+    , _place(place)
+    , _deployment_time(deployment_time)
+    , _is_active(true)
+    , _id(id)
 {
 }
 
-Infected::Infected(Place* place, size_t deployment_time)
+void Infected::reduceHealth(int damage)
 {
-}
-
-Infected::~Infected()
-{
-}
-
-void Infected::reduceHealth()
-{
-}
-
-void Infected::addTo(Place* place)
-{
-}
-
-void Infected::removeFrom()
-{
+    _health -= damage;
+    if (_health > _max_health) {
+        _health = _max_health;
+    } else if (_health < 0) {
+        removeFrom();
+        _is_active = false;
+    }
 }

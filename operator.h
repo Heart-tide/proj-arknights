@@ -12,14 +12,14 @@ class Operator : public Infected {
     Q_OBJECT
 
 public:
-    explicit Operator(QWidget* parent = nullptr);
-    explicit Operator(Place* place, size_t deployment_time);
+    Operator(Place* place, size_t deployment_time);
     ~Operator();
 
-    void action() override;
+    void action(size_t time, size_t& hp) override;
     void deploy();
 
     static constexpr size_t cost = 12;
+    QString giveName() const override { return "Operator"; }
 
 protected:
     size_t _block;

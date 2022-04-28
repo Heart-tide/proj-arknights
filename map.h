@@ -6,6 +6,8 @@
 #include <vector>
 using std::vector;
 
+class GameState;
+
 //* 一行，由很多格子组成
 class Line : public QWidget {
     Q_OBJECT
@@ -35,6 +37,8 @@ class Map : public QWidget {
     Q_OBJECT
 
 public:
+    friend class GameState;
+
     Map();
     Map(size_t height, size_t width);
     Map(vector<Line*> lines);

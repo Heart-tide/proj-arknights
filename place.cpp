@@ -1,10 +1,12 @@
 #include "place.h"
 #include "ui_place.h"
 #include <QDebug>
+#include <QString>
 
 Place::Place()
     : ui(new Ui::Place)
     , _op(nullptr)
+    , _id(pair<size_t, size_t>(0, 0))
 {
     ui->setupUi(this);
 }
@@ -24,31 +26,8 @@ void Place::removeReunion(Reunion* reunion)
     }
 }
 
-void UnreachablePlace::addOperator(Operator* op)
+QString Place::giveId() const
 {
-    qDebug() << "无法向不可到达地块添加干员";
-    exit(-1);
-}
-
-void UnreachablePlace::addReunion(Reunion* reunion)
-{
-    qDebug() << "无法向不可到达地块添加整合运动";
-    exit(-1);
-}
-
-void UnreachablePlace::removeOperator(Operator* op)
-{
-    qDebug() << "无法从不可到达地块移除干员";
-    exit(-1);
-}
-
-void UnreachablePlace::removeReunion(Reunion* reunion)
-{
-    qDebug() << "无法从不可到达地块移除整合运动";
-    exit(-1);
-}
-
-void Entrance::addReunion(Reunion* reunion)
-{
-    _reunions.push_back(reunion);
+    return "[" + QString::number(_id.first)
+        + "," + QString::number(_id.second) + "]";
 }

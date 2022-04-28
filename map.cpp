@@ -63,6 +63,12 @@ void Map::loadMap()
     //* 一阶段测试地图，从右上到左下
     (*this)[0][giveWidth() - 1] = _entrance;
     (*this)[giveHeight() - 1][0] = _base;
+    //* 赋予每个格子以id
+    for (size_t i = 0; i < giveHeight(); i++) {
+        for (size_t j = 0; j < giveWidth(); j++) {
+            (*this)[i][j]->_id = pair<size_t, size_t>(i, j);
+        }
+    }
 }
 
 void Map::loadRoutes()
@@ -72,16 +78,18 @@ void Map::loadRoutes()
     size_t width = giveWidth();
     size_t height = giveHeight();
     vector<Place*> route;
-    for (size_t i = height - 1; i != 0; i--) {
+    for (int i = height - 1; i != -1; i--) {
         route.push_back((*this)[i][0]);
     }
     for (size_t i = 1; i != width; i++) {
         route.push_back((*this)[0][i]);
     }
+    _routes.push_back(route);
 }
 
 vector<Place*> Map::giveRandomRoute() const
 {
     srand(static_cast<unsigned>(clock()));
-    return _routes[rand() % _routes.size()];
+    auto i = rand() % _routes.size();
+    return _routes[i];
 }
