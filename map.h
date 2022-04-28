@@ -7,24 +7,23 @@
 using std::vector;
 
 //* 一行，由很多格子组成
-class Line : public QWidget
-{
+class Line : public QWidget {
     Q_OBJECT
 
 public:
-    explicit Line(QWidget *parent = nullptr);
-    Line(size_t width);
-    Line(vector<Place*> places);
-    ~Line();
+    Line() = default;
+    explicit Line(size_t size);
+    explicit Line(vector<Place*> places);
+    ~Line() = default;
 
-    Place& operator[](size_t i);
-    const Place& operator[](size_t i) const;
+    Place*& operator[](size_t i) { return _places[i]; }
+    const Place* operator[](size_t i) const { return _places[i]; }
 
-    Line& addPlace(Place* place);
+    void addPlace(Place* place);
+    size_t giveSize() const { return _places.size(); }
 
 private:
-    vector<Place*> places;
-    size_t width;
+    vector<Place*> _places;
 };
 
 //* 一张地图，由很多行组成
@@ -32,32 +31,33 @@ namespace Ui {
 class Map;
 }
 
-class Map : public QWidget
-{
+class Map : public QWidget {
     Q_OBJECT
 
 public:
-    explicit Map(QWidget *parent = nullptr);
+    Map();
     Map(size_t height, size_t width);
     Map(vector<Line*> lines);
     ~Map();
 
-    Line& operator[](size_t i);
-    const Line& operator[](size_t i) const;
+    Line*& operator[](size_t i) { return _lines[i]; }
+    const Line* operator[](size_t i) const { return _lines[i]; }
 
-    Map& addLine(Line* line);
+    void addLine(Line* line);
     void loadMap();
     void loadRoutes(); //* 只按坐标保存路径，载入时换算成Place*链表，并存入entrance中
 
+    size_t giveHeight() const { return _lines.size(); }
+    size_t giveWidth() const { return _lines.empty() ? 0 : _lines[0]->giveSize(); }
+    vector<Place*> giveRandomRoute() const;
+
 private:
-    Ui::Map *ui;
+    Ui::Map* ui;
 
-    vector<Line*> lines;
-    size_t height;
-    size_t width;
-
-    Base* base;
-    Entrance* entrance;
+    vector<Line*> _lines;
+    Base* _base;
+    Entrance* _entrance;
+    vector<vector<Place*>> _routes;
 };
 
 #endif // MAP_H

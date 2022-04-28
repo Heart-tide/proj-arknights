@@ -14,38 +14,36 @@ namespace Ui {
 class Place;
 }
 
-class Place : public QWidget
-{
+class Place : public QWidget {
     Q_OBJECT
 
 public:
-    explicit Place(QWidget *parent = nullptr);
+    Place();
     virtual ~Place();
 
-    virtual void addOperator(Operator* op);
-    virtual void addReunion(Reunion* reunion);
-    virtual void removeOperator(Operator* op);
+    virtual void addOperator(Operator* op) { _op = op; }
+    virtual void addReunion(Reunion* reunion) { _reunions.push_back(reunion); }
+    virtual void removeOperator(Operator* op) { _op = nullptr; }
     virtual void removeReunion(Reunion* reunion);
 
     static constexpr bool is_base = false;
     static constexpr bool is_entrance = false;
 
 protected:
-    Operator* op;
-    vector<Reunion*> reunions;
+    Operator* _op;
+    vector<Reunion*> _reunions;
 
 private:
-    Ui::Place *ui;
+    Ui::Place* ui;
 };
 
 //************* Place有三个子类：不可到达的地块、低地、高地 *************
 
 //* 这里是不可到达地块
-class UnreachablePlace: public Place
-{
+class UnreachablePlace : public Place {
 public:
-    explicit UnreachablePlace(QWidget *parent = nullptr);
-    ~UnreachablePlace();
+    UnreachablePlace() = default;
+    ~UnreachablePlace() = default;
 
     void addOperator(Operator* op) override;
     void addReunion(Reunion* reunion) override;
@@ -53,35 +51,30 @@ public:
     void removeReunion(Reunion* reunion) override;
 };
 
-class Base: public UnreachablePlace
-{
+class Base : public UnreachablePlace {
     Q_OBJECT
 
 public:
-    explicit Base(QWidget *parent = nullptr);
-    ~Base();
+    Base() = default;
+    ~Base() = default;
 
-    void addReunion(Reunion* reunion) override;
+    void addReunion(Reunion* reunion) override { }
 
     static constexpr bool is_base = true;
 };
 
-class Entrance: public UnreachablePlace
-{
+class Entrance : public UnreachablePlace {
     Q_OBJECT
 
 public:
-    explicit Entrance(QWidget *parent = nullptr);
-    ~Entrance();
+    Entrance() = default;
+    ~Entrance() = default;
 
-    void strategy(); //* 每次出怪时，按费用随机生成一个，随机选取行进路线
+    void addReunion(Reunion* reunion) override;
 
     static constexpr bool is_entrance = true;
 
 private:
-    vector<vector<Place*>> routes;
-    size_t create_interval;
-    size_t reunion_dp;
 };
 
 #endif // PLACE_H
