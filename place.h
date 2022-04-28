@@ -29,11 +29,14 @@ public:
 
     virtual void addOperator(Operator* op) { _op = op; }
     virtual void addReunion(Reunion* reunion) { _reunions.push_back(reunion); }
-    virtual void removeOperator(Operator* op) { _op = nullptr; }
+    virtual void removeOperator() { _op = nullptr; }
     virtual void removeReunion(Reunion* reunion);
 
-    virtual bool is_base() { return false; }
-    virtual bool is_entrance() { return false; }
+    virtual bool isBase() { return false; }
+    virtual bool isEntrance() { return false; }
+
+    Operator* giveOperator() { return _op; }
+    vector<Reunion*>& giveReunions() { return _reunions; }
     QString giveId() const;
 
 protected:
@@ -47,26 +50,27 @@ private:
 
 //************* Place有三个子类：不可到达的地块、低地、高地 *************
 
+//* 这里是不可到达地块
+
+class UnreachablePlace : public Place {
+public:
+    void addOperator(Operator* op) override { }
+    void addReunion(Reunion* reunion) override { }
+    void removeOperator() override { }
+    void removeReunion(Reunion* reunion) override { }
+};
 class Base : public Place {
     Q_OBJECT
 
 public:
-    Base() = default;
-    ~Base() = default;
-
-    bool is_base() override { return true; }
+    bool isBase() override { return true; }
 };
 
 class Entrance : public Place {
     Q_OBJECT
 
 public:
-    Entrance() = default;
-    ~Entrance() = default;
-
-    bool is_entrance() override { return true; }
-
-private:
+    bool isEntrance() override { return true; }
 };
 
 #endif // PLACE_H

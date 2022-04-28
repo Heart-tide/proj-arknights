@@ -21,14 +21,6 @@ GameState::GameState(size_t create_intervel, size_t total_hp,
     _timer->start(1000 / _speed);
 }
 
-void GameState::deployOperator()
-{
-}
-
-void GameState::removeOperator()
-{
-}
-
 void GameState::configure()
 {
     _map->loadMap();
@@ -37,9 +29,9 @@ void GameState::configure()
     for (size_t i = 0; i < _map->giveHeight(); i++) {
         QString line("\t");
         for (size_t j = 0; j < _map->giveWidth(); j++) {
-            if ((*_map)[i][j]->is_base())
+            if ((*_map)[i][j]->isBase())
                 line += "B  ";
-            else if ((*_map)[i][j]->is_entrance())
+            else if ((*_map)[i][j]->isEntrance())
                 line += "E  ";
             else
                 line += "*  ";
@@ -57,30 +49,67 @@ void GameState::update()
     }
     qDebug() << "[" << _time << "]";
     _time++;
-    strategy();
-    vector<Reunion*> still_active;
-    for (auto it = _active_reunions.begin();
-         it < _active_reunions.end(); it++) {
+    reunionStragegy();
+    reunionActions();
+    operatorActions();
+}
+
+void GameState::deployOperator(size_t choice, size_t x, size_t y)
+{
+    Operator* op = nullptr;
+    static size_t id_counter = 0;
+    switch (choice) {
+    case 0:
+        op = new TestOperator((*_map)[x][y], _time, id_counter++, this);
+        break;
+    }
+    _active_operators.push_back(op);
+    qDebug() << "\tCREATE" << qPrintable(op->giveName()) << "#"
+             << op->giveId() << "|" << qPrintable(op->givePlace()->giveId());
+}
+
+void GameState::operatorActions()
+{
+    vector<Operator*> still_active;
+    for (auto it = _active_operators.begin();
+         it < _active_operators.end(); it++) {
         if ((*it)->isActive()) {
-            (*it)->action(_time, _hp);
+            vector<Infected*> attackeds; //* 暂时干员只能攻击与自己同格子的单位
+            for (size_t i = 0; i < (*it)->givePlace()->giveReunions().size(); i++)
+                attackeds.push_back((*it)->givePlace()->giveReunions()[i]);
+            (*it)->action(_time, attackeds);
             still_active.push_back(*it);
         }
     }
-    _active_reunions = still_active;
+    _active_operators = still_active;
 }
 
-void GameState::strategy()
+void GameState::reunionStragegy()
 {
-    if (_time % _create_interval != 0)
+    if (_time % _create_interval != 1)
         return;
     static size_t count = 0;
-    if (count >= 2) //* 出俩得了!!!
+    if (count >= 2) //* 出俩就得了!!!
         return;
     count++;
     auto reunion = giveRandomReunion();
     reunion->addTo(_map->_entrance);
     _active_reunions.push_back(reunion);
-    qDebug() << "\tCREATE" << qPrintable(reunion->giveName()) << "#" << reunion->giveId();
+    qDebug() << "\tCREATE" << qPrintable(reunion->giveName()) << "#"
+             << reunion->giveId() << "|" << qPrintable(reunion->givePlace()->giveId());
+}
+
+void GameState::reunionActions()
+{
+    vector<Reunion*> still_active;
+    for (auto it = _active_reunions.begin();
+         it < _active_reunions.end(); it++) {
+        if ((*it)->isActive()) {
+            (*it)->action(_time, _hp, (*it)->givePlace()->giveOperator());
+            still_active.push_back(*it);
+        }
+    }
+    _active_reunions = still_active;
 }
 
 Reunion* GameState::giveRandomReunion()

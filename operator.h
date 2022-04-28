@@ -12,13 +12,17 @@ class Operator : public Infected {
     Q_OBJECT
 
 public:
-    Operator(Place* place, size_t deployment_time);
-    ~Operator();
+    Operator(size_t health, int damage, size_t interval,
+        Place* place, size_t deployment_time, size_t id, QWidget* parent,
+        size_t block);
+    ~Operator() = default;
 
-    void action(size_t time, size_t& hp) override;
-    void deploy();
+    void action(size_t time, vector<Infected*>& reunions);
 
-    static constexpr size_t cost = 12;
+    void addTo(Place* place) override;
+    void removeFrom() override;
+
+    virtual size_t cost() = 0;
     QString giveName() const override { return "Operator"; }
 
 protected:
@@ -26,6 +30,17 @@ protected:
 
 private:
     Ui::Operator* ui;
+};
+
+class TestOperator : public Operator {
+    Q_OBJECT
+
+public:
+    TestOperator(Place* place, size_t deployment_time,
+        size_t id, QWidget* parent);
+
+    size_t cost() override { return 0; }
+    QString giveName() const override { return "TestOperator"; }
 };
 
 #endif // OPERATOR_H

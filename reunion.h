@@ -16,22 +16,20 @@ class Reunion : public Infected {
     Q_OBJECT
 
 public:
-    Reunion(size_t health, int damage, size_t attack_interval,
+    Reunion(size_t health, int damage, size_t interval,
         Place* place, size_t deployment_time, size_t move_speed,
         size_t id, vector<Place*> route, QWidget* parent);
     ~Reunion() = default;
 
-    void action(size_t time, size_t& hp) override;
+    void action(size_t time, size_t& hp, Infected* op);
     void addTo(Place* place) override;
     void removeFrom() override;
 
-    //* reunion也有cost，用于随机生成的出怪策略
     virtual bool is_flying() { return false; }
     QString giveName() const override { return "Reunion"; }
 
 protected:
-    bool _is_blocked;
-    size_t _move_speed; //* 每步移动需要的tick数
+    size_t _move_speed; //* 每步移动的距离
     vector<Place*> _route;
 
 private:

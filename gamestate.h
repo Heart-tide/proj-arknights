@@ -3,6 +3,7 @@
 
 #include "infected.h"
 #include "map.h"
+#include "operator.h"
 #include "reunion.h"
 #include <QTimer>
 #include <QWidget>
@@ -15,17 +16,20 @@ public:
         size_t default_speed, QWidget* parent);
     ~GameState() = default;
 
-    void deployOperator();
-    void removeOperator();
     void configure();
     void update();
-    void strategy();
+
+    void deployOperator(size_t choice, size_t x, size_t y);
+    void operatorActions();
+
+    void reunionStragegy();
+    void reunionActions();
     Reunion* giveRandomReunion();
 
 private:
     Map* _map;
     QTimer* _timer;
-    vector<Operator*> _operators;
+    vector<Operator*> _active_operators;
     vector<Reunion*> _active_reunions;
 
     size_t _create_interval;
