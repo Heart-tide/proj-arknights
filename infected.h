@@ -17,16 +17,17 @@ public:
     virtual ~Infected() = default;
 
     void reduceHealth(int damage);
+
     virtual void addTo(Place* place) = 0;
     virtual void removeFrom() = 0;
 
-    virtual size_t cost() { return 0; }
-    bool isActive() { return _is_active; }
-
     virtual QString giveName() const { return "Infected"; }
+    virtual size_t giveCost() { return 0; }
+
     size_t giveId() const { return _id; }
     Place* givePlace() { return _place; }
     int giveHealth() { return _health; }
+    bool isActive() { return _is_active; }
 
 protected:
     size_t _health;
@@ -42,6 +43,6 @@ protected:
     size_t _id;
 };
 
-Infected* giveRandomInfected(vector<Infected*>& infecteds);
+Infected* giveRandomInfected(QVector<Infected*>& infecteds);
 
 #endif // INFECTED_H

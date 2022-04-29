@@ -17,12 +17,12 @@ public:
         size_t block);
     ~Operator() = default;
 
-    void action(size_t time, vector<Infected*>& reunions);
+    void action(size_t time, QVector<Infected*>& reunions);
 
     void addTo(Place* place) override;
     void removeFrom() override;
 
-    virtual size_t cost() = 0;
+    virtual size_t giveCost() = 0;
     QString giveName() const override { return "Operator"; }
 
 protected:
@@ -39,7 +39,7 @@ public:
     TestOperator(Place* place, size_t deployment_time,
         size_t id, QWidget* parent);
 
-    size_t cost() override { return 0; }
+    size_t giveCost() override { return 0; }
     QString giveName() const override { return "TestOperator"; }
 };
 

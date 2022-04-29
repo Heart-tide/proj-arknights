@@ -10,7 +10,7 @@ Operator::Operator(size_t health, int damage, size_t interval,
 {
 }
 
-void Operator::action(size_t time, vector<Infected*>& reunions)
+void Operator::action(size_t time, QVector<Infected*>& reunions)
 {
     if (_is_active == false || (time - _last_action_time) < _interval) {
         return;

@@ -10,7 +10,7 @@ Line::Line(size_t size)
     }
 }
 
-Line::Line(vector<Place*> places)
+Line::Line(QVector<Place*> places)
     : _places(places)
 {
     for (auto& place : _places) {
@@ -39,7 +39,7 @@ Map::Map(size_t height, size_t width)
     }
 }
 
-Map::Map(vector<Line*> lines)
+Map::Map(QVector<Line*> lines)
     : Map()
 {
     for (auto it = lines.begin(); it < lines.end(); it++) {
@@ -66,7 +66,7 @@ void Map::loadMap()
     //* 赋予每个格子以id
     for (size_t i = 0; i < giveHeight(); i++) {
         for (size_t j = 0; j < giveWidth(); j++) {
-            (*this)[i][j]->_id = pair<size_t, size_t>(i, j);
+            (*this)[i][j]->_id = QPair<size_t, size_t>(i, j);
         }
     }
 }
@@ -77,7 +77,7 @@ void Map::loadRoutes()
     //* 存储时由终点向起点
     size_t width = giveWidth();
     size_t height = giveHeight();
-    vector<Place*> route;
+    QVector<Place*> route;
     for (int i = height - 1; i != -1; i--) {
         route.push_back((*this)[i][0]);
     }
@@ -87,7 +87,7 @@ void Map::loadRoutes()
     _routes.push_back(route);
 }
 
-vector<Place*> Map::giveRandomRoute() const
+QVector<Place*> Map::giveRandomRoute() const
 {
     srand(static_cast<unsigned>(clock()));
     auto i = rand() % _routes.size();

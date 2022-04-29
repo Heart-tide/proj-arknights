@@ -32,7 +32,7 @@ void Infected::reduceHealth(int damage)
     }
 }
 
-Infected* giveRandomInfected(vector<Infected*>& infecteds)
+Infected* giveRandomInfected(QVector<Infected*>& infecteds)
 {
     srand(static_cast<unsigned>(clock()));
     return infecteds[rand() % infecteds.size()];

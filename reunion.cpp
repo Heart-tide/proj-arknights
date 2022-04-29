@@ -1,10 +1,9 @@
-
 #include "reunion.h"
 #include <QDebug>
 
 Reunion::Reunion(size_t health, int damage, size_t interval,
     Place* place, size_t deployment_time, size_t move_speed,
-    size_t id, vector<Place*> route, QWidget* parent)
+    size_t id, QVector<Place*> route, QWidget* parent)
     : Infected(health, damage, interval, place,
         deployment_time, id, parent)
     , _move_speed(move_speed)
@@ -60,7 +59,7 @@ void Reunion::removeFrom()
 }
 
 TestReunion::TestReunion(Place* place, size_t deployment_time,
-    size_t id, vector<Place*> route, QWidget* parent)
+    size_t id, QVector<Place*> route, QWidget* parent)
     : Reunion(20, 5, 3, place, deployment_time, 1, id, route, parent)
 {
 }

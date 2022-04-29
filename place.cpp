@@ -6,7 +6,7 @@
 Place::Place()
     : ui(new Ui::Place)
     , _op(nullptr)
-    , _id(pair<size_t, size_t>(0, 0))
+    , _id(QPair<size_t, size_t>(0, 0))
 {
     ui->setupUi(this);
 }
@@ -16,7 +16,13 @@ Place::~Place()
     delete ui;
 }
 
-void Place::removeReunion(Reunion* reunion)
+void Place::addOperator(Infected* op)
+{
+    if (_op == nullptr)
+        _op = op;
+}
+
+void Place::removeReunion(Infected* reunion)
 {
     for (auto it = _reunions.begin(); it < _reunions.end(); it++) {
         if (*it == reunion) {

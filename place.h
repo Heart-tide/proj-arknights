@@ -1,12 +1,10 @@
 #ifndef PLACE_H
 #define PLACE_H
 
+#include <QPair>
 #include <QString>
+#include <QVector>
 #include <QWidget>
-#include <map>
-#include <vector>
-using std::pair;
-using std::vector;
 
 class Map;
 class Infected;
@@ -27,37 +25,37 @@ public:
     Place();
     virtual ~Place();
 
-    virtual void addOperator(Operator* op) { _op = op; }
-    virtual void addReunion(Reunion* reunion) { _reunions.push_back(reunion); }
+    virtual void addOperator(Infected* op);
+    virtual void addReunion(Infected* reunion) { _reunions.push_back(reunion); }
     virtual void removeOperator() { _op = nullptr; }
-    virtual void removeReunion(Reunion* reunion);
+    virtual void removeReunion(Infected* reunion);
 
     virtual bool isBase() { return false; }
     virtual bool isEntrance() { return false; }
 
-    Operator* giveOperator() { return _op; }
-    vector<Reunion*>& giveReunions() { return _reunions; }
+    Infected* giveOperator() { return _op; }
+    QVector<Infected*>& giveReunions() { return _reunions; }
     QString giveId() const;
 
 protected:
-    Operator* _op;
-    vector<Reunion*> _reunions;
-    pair<size_t, size_t> _id;
+    Infected* _op;
+    QVector<Infected*> _reunions;
+    QPair<size_t, size_t> _id;
 
 private:
     Ui::Place* ui;
 };
 
-//************* Place有三个子类：不可到达的地块、低地、高地 *************
+//************* Place 有三个子类：不可到达的地块、低地、高地 *************
 
 //* 这里是不可到达地块
 
 class UnreachablePlace : public Place {
 public:
-    void addOperator(Operator* op) override { }
-    void addReunion(Reunion* reunion) override { }
+    void addOperator(Infected* op) override { }
+    void addReunion(Infected* reunion) override { }
     void removeOperator() override { }
-    void removeReunion(Reunion* reunion) override { }
+    void removeReunion(Infected* reunion) override { }
 };
 class Base : public Place {
     Q_OBJECT
