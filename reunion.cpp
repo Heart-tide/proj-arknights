@@ -9,6 +9,11 @@ Reunion::Reunion(size_t health, int damage, size_t interval,
     , _move_speed(move_speed)
     , _route(route)
 {
+    _route.pop_back();
+    //? _move_speed 原为无符号整数，运算时出大问题！以后运算前先检查各操作数类型！！！
+    direction.first = (_route.back()->x() - _place->x()) / 100 * _move_speed;
+    direction.second = (_route.back()->y() - _place->y()) / 100 * _move_speed;
+    setGeometry(_place->x(), _place->y(), 100, 100);
 }
 
 void Reunion::action(size_t time, size_t& hp, Infected* op)
@@ -31,17 +36,20 @@ void Reunion::action(size_t time, size_t& hp, Infected* op)
                      << "#" << op->giveId();
         }
     } else {
-        //* 暂时无视移动距离书写，每次移动一格
-        _route.pop_back();
-        qDebug() << "\tMOVE" << qPrintable(giveName()) << "#"
-                 << _id << qPrintable(_place->giveId()) << "-->"
-                 << qPrintable(_route.back()->giveId());
-        removeFrom();
-        addTo(_route.back());
-        if (_route.back()->isBase()) {
-            qDebug() << "\tGETINTOBASE" << qPrintable(giveName()) << "#" << giveId();
-            _is_active = false;
-            hp--;
+        //* 移动！
+        setGeometry(x() + direction.first, y() + direction.second, 100, 100);
+        update();
+        if (geometry() == _route.back()->geometry()) {
+            removeFrom();
+            addTo(_route.back());
+            _route.pop_back();
+            direction.first = (_route.back()->x() - _place->x()) / 100 * _move_speed;
+            direction.second = (_route.back()->y() - _place->y()) / 100 * _move_speed;
+            if (_place->isBase()) {
+                qDebug() << "\tGETINTOBASE" << qPrintable(giveName()) << "#" << giveId();
+                _is_active = false;
+                hp--;
+            }
         }
     }
 }
@@ -60,6 +68,15 @@ void Reunion::removeFrom()
 
 TestReunion::TestReunion(Place* place, size_t deployment_time,
     size_t id, QVector<Place*> route, QWidget* parent)
-    : Reunion(20, 5, 3, place, deployment_time, 1, id, route, parent)
+    : Reunion(20, 5, 3, place, deployment_time, 2, id, route, parent)
 {
+    //? 要show才能调用绘图事件！！！
+    show();
+}
+
+void TestReunion::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
+    QPixmap yuan("://res/reunion/yuan.png");
+    painter.drawPixmap(0, 0, 100, 100, yuan);
 }

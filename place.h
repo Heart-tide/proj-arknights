@@ -12,9 +12,6 @@ class Operator;
 class Reunion;
 
 //* 一个格子，很普通
-namespace Ui {
-class Place;
-}
 
 class Place : public QWidget {
     Q_OBJECT
@@ -22,8 +19,7 @@ class Place : public QWidget {
 public:
     friend class Map;
 
-    Place();
-    virtual ~Place();
+    Place(QWidget* parent);
 
     virtual void addOperator(Infected* op);
     virtual void addReunion(Infected* reunion) { _reunions.push_back(reunion); }
@@ -37,13 +33,12 @@ public:
     QVector<Infected*>& giveReunions() { return _reunions; }
     QString giveId() const;
 
+    void mousePressEvent(QMouseEvent* event) override;
+
 protected:
     Infected* _op;
     QVector<Infected*> _reunions;
     QPair<size_t, size_t> _id;
-
-private:
-    Ui::Place* ui;
 };
 
 //************* Place 有三个子类：不可到达的地块、低地、高地 *************
@@ -52,22 +47,26 @@ private:
 
 class UnreachablePlace : public Place {
 public:
-    void addOperator(Infected* op) override { }
-    void addReunion(Infected* reunion) override { }
+    UnreachablePlace(QWidget* parent);
+
+    void addOperator(Infected*) override { }
+    void addReunion(Infected*) override { }
     void removeOperator() override { }
-    void removeReunion(Infected* reunion) override { }
+    void removeReunion(Infected*) override { }
 };
-class Base : public Place {
+class Base : public UnreachablePlace {
     Q_OBJECT
 
 public:
+    Base(QWidget* parent);
     bool isBase() override { return true; }
 };
 
-class Entrance : public Place {
+class Entrance : public UnreachablePlace {
     Q_OBJECT
 
 public:
+    Entrance(QWidget* parent);
     bool isEntrance() override { return true; }
 };
 

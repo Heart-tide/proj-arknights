@@ -1,50 +1,16 @@
 #include "map.h"
 #include "ui_map.h"
+#include <QDebug>
+#include <QMouseEvent>
+#include <QPainter>
 #include <ctime>
 
-Line::Line(size_t size)
-{
-    Place* places = new Place[size];
-    for (size_t i = 0; i < size; i++) {
-        addPlace(places + i);
-    }
-}
-
-Line::Line(QVector<Place*> places)
-    : _places(places)
-{
-    for (auto& place : _places) {
-        place->setParent(this);
-    }
-}
-
-void Line::addPlace(Place* place)
-{
-    place->setParent(this);
-    _places.push_back(place);
-}
-
-Map::Map()
-    : _base(new Base)
-    , _entrance(new Entrance)
-{
-}
-
 Map::Map(size_t height, size_t width)
-    : Map()
 {
-    for (size_t i = 0; i < height; i++) {
-        Line* line = new Line(width);
-        addLine(line);
-    }
-}
-
-Map::Map(QVector<Line*> lines)
-    : Map()
-{
-    for (auto it = lines.begin(); it < lines.end(); it++) {
-        addLine(*it);
-    }
+    loadMap(height, width);
+    loadRoutes();
+    qDebug() << giveWidth() << "*" << giveHeight() << "大小的地图已生成";
+    qDebug() << "游戏开始了哦!\n";
 }
 
 Map::~Map()
@@ -52,39 +18,82 @@ Map::~Map()
     delete ui;
 }
 
-void Map::addLine(Line* line)
+void Map::loadMap(size_t height, size_t width)
 {
-    line->setParent(this);
-    _lines.push_back(line);
-}
-
-void Map::loadMap()
-{
-    //* 一阶段测试地图，从右上到左下
-    (*this)[0][giveWidth() - 1] = _entrance;
-    (*this)[giveHeight() - 1][0] = _base;
-    //* 赋予每个格子以id
-    for (size_t i = 0; i < giveHeight(); i++) {
-        for (size_t j = 0; j < giveWidth(); j++) {
-            (*this)[i][j]->_id = QPair<size_t, size_t>(i, j);
+    for (size_t i = 0; i < height; i++) {
+        QVector<Place*> line;
+        for (size_t j = 0; j < width; j++) {
+            Place* place = nullptr;
+            if (i == 0 && j == width - 1) {
+                _entrance = new Entrance(this);
+                place = _entrance;
+            } else if (i == height - 1 && j == 0) {
+                _base = new Base(this);
+                place = _base;
+            } else {
+                place = new Place(this);
+            }
+            line.push_back(place);
+            place->setGeometry(j * 100 + 5, i * 100 + 5, 100, 100);
+            place->_id = QPair<size_t, size_t>(i, j);
         }
+        _lines.push_back(line);
     }
 }
 
 void Map::loadRoutes()
 {
-    //* 一阶段测试路径，右上 --> 左上 --> 左下
+    //* 测试路径一，右上 --> 左下
     //* 存储时由终点向起点
+    //* 随机生成 10 条路径
     size_t width = giveWidth();
     size_t height = giveHeight();
-    QVector<Place*> route;
-    for (int i = height - 1; i != -1; i--) {
-        route.push_back((*this)[i][0]);
+    srand(static_cast<unsigned>(clock()));
+    for (size_t p = 0; p < 10; p++) {
+        QVector<Place*> route;
+        size_t i = height - 1, j = 0;
+        route.push_back((*this)[i][j]);
+        for (int q = 0; q < height + width - 1; q++) {
+            if (i == 0) {
+                route.push_back((*this)[i][j++]);
+                continue;
+            }
+            if (j == width - 1) {
+                route.push_back((*this)[i--][j]);
+                continue;
+            }
+            if (rand() % 2 == 0) {
+                route.push_back((*this)[i--][j]);
+            } else {
+                route.push_back((*this)[i][j++]);
+            }
+        }
+        _routes.push_back(route);
     }
-    for (size_t i = 1; i != width; i++) {
-        route.push_back((*this)[0][i]);
+}
+
+void Map::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
+    QPixmap common_place("://res/place/jia.jpg");
+    for (size_t i = 0; i < giveHeight(); i++) {
+        for (size_t j = 0; j < giveWidth(); j++) {
+            Place* place = (*this)[i][j];
+            if (place->isBase()) {
+                painter.setPen(QPen(Qt::blue, 5));
+                painter.drawRect(place->x(), place->y(), place->width() - 5, place->height() - 5);
+                painter.drawLine(place->x(), place->y(), place->x() + place->width() - 5, place->y() + place->height() - 5);
+                painter.drawLine(place->x() + place->width() - 5, place->y(), place->x(), place->y() + place->height() - 5);
+            } else if (place->isEntrance()) {
+                painter.setPen(QPen(Qt::red, 5));
+                painter.drawRect(place->x(), place->y(), place->height() - 5, place->width() - 5);
+                painter.drawLine(place->x(), place->y(), place->x() + place->width() - 5, place->y() + place->height() - 5);
+                painter.drawLine(place->x() + place->width() - 5, place->y(), place->x(), place->y() + place->height() - 5);
+            } else {
+                painter.drawPixmap(place->x(), place->y(), place->height() - 5, place->width() - 5, common_place);
+            }
+        }
     }
-    _routes.push_back(route);
 }
 
 QVector<Place*> Map::giveRandomRoute() const

@@ -8,11 +8,9 @@ MainWindow::MainWindow(QWidget* parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    auto game = new GameState(3, 10, 100, 1, this);
-    connect(ui->deploy_operator_btn, &QPushButton::clicked,
-        game, [=]() {
-            game->deployOperator(0, 0, 0);
-        });
+    resize(800, 600);
+    setWindowTitle("Arknights");
+    new GameState(100, 200, 100, 1, this);
 }
 
 MainWindow::~MainWindow()

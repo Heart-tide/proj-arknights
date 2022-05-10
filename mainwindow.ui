@@ -6,25 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>784</width>
-    <height>541</height>
+    <width>900</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="deploy_operator_btn">
+   <widget class="Place" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>130</y>
-      <width>451</width>
-      <height>221</height>
+      <x>170</x>
+      <y>180</y>
+      <width>120</width>
+      <height>101</height>
      </rect>
-    </property>
-    <property name="text">
-     <string>Deploy Key Operator</string>
     </property>
    </widget>
   </widget>
@@ -33,13 +30,21 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>784</width>
+     <width>900</width>
      <height>26</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Place</class>
+   <extends>QWidget</extends>
+   <header>place.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

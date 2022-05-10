@@ -16,7 +16,6 @@ public:
     GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_speed, QWidget* parent);
     ~GameState() = default;
 
-    void configure();
     void update();
 
     void deployOperator(size_t choice, size_t x, size_t y);

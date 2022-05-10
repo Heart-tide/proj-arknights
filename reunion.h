@@ -29,8 +29,9 @@ public:
     QString giveName() const override { return "Reunion"; }
 
 protected:
-    size_t _move_speed; //* 每步移动的距离
+    int _move_speed; //* 每步移动的距离
     QVector<Place*> _route;
+    QPair<int, int> direction;
 
 private:
     Ui::Reunion* ui;
@@ -44,6 +45,7 @@ public:
         size_t id, QVector<Place*> route, QWidget* parent);
 
     QString giveName() const override { return "TestReunion"; }
+    void paintEvent(QPaintEvent*) override;
 };
 
 #endif // REUNION_H

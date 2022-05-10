@@ -2,6 +2,7 @@
 #define INFECTED_H
 
 #include "place.h"
+#include <QPainter>
 #include <QString>
 #include <QWidget>
 

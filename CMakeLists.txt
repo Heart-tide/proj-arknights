@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(proj-arknights LANGUAGES CXX)
 
+file(GLOB_RECURSE QRC_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -10,6 +12,8 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(QRC_SOURCE_FILES res.qrc)
 
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
 # Check http://doc.qt.io/qt-5/deployment-android.html for more information.
@@ -25,6 +29,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #endif()
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
+qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
+SOURCE_GROUP("Resource Files" FILES ${QRC_SOURCE_FILES})
 
 if(ANDROID)
   add_library(proj-arknights SHARED
@@ -48,11 +55,12 @@ if(ANDROID)
     mainwindow.ui 
     map.ui 
     operator.ui 
-    place.ui 
     reunion.ui
   )
 else()
   add_executable(proj-arknights
+    ${QRC_FILES}
+    
     gamestate.cpp
     infected.cpp
     main.cpp
@@ -73,7 +81,6 @@ else()
     mainwindow.ui 
     map.ui 
     operator.ui 
-    place.ui 
     reunion.ui
   )
 endif()

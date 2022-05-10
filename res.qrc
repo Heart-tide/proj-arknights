@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/place/jia.jpg</file>
+        <file>res/reunion/yuan.png</file>
+    </qresource>
+</RCC>

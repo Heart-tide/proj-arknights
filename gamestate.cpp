@@ -4,7 +4,8 @@
 #include <ctime>
 
 GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_speed, QWidget* parent)
-    : _map(new Map(3, 4))
+    : QWidget(parent)
+    , _map(new Map(5, 7))
     , _timer(new QTimer(this))
     , _reunion_stats(reunion_stats)
     , _create_interval(create_intervel)
@@ -12,34 +13,15 @@ GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_
     , _time(0)
     , _dp(0)
     , _hp(total_hp)
-    , _speed(1)
+    , _speed(default_speed)
     , _is_paused(false)
 {
     _map->setParent(this);
-    configure();
     connect(_timer, &QTimer::timeout, this, &GameState::update);
-    _timer->start(1000 / _speed);
-}
+    _timer->start(10 / _speed); //* 10ms 更新一次！
 
-//* 游戏初始化
-void GameState::configure()
-{
-    _map->loadMap();
-    _map->loadRoutes();
-    qDebug() << _map->giveWidth() << "*" << _map->giveHeight() << "大小的地图已生成:\n";
-    for (size_t i = 0; i < _map->giveHeight(); i++) {
-        QString line("\t");
-        for (size_t j = 0; j < _map->giveWidth(); j++) {
-            if ((*_map)[i][j]->isBase())
-                line += "B  ";
-            else if ((*_map)[i][j]->isEntrance())
-                line += "E  ";
-            else
-                line += "*  ";
-        }
-        qDebug() << qPrintable(line) << "\n";
-    }
-    qDebug() << "游戏开始了哦!\n";
+    resize(static_cast<QWidget*>(this->parent())->size()); //* 将自身大小改为父对象大小
+    _map->resize(static_cast<QWidget*>(this->parent())->size());
 }
 
 //* update 函数，与 gamestate 计时器 connect
@@ -118,5 +100,7 @@ Reunion* GameState::createRandomReunion()
     case 0:
         return new TestReunion(_map->_entrance, _time, id_counter++,
             _map->giveRandomRoute(), this);
+    default:
+        return nullptr;
     }
 }
