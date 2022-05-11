@@ -27,7 +27,7 @@ Map::~Map()
 void Map::loadMap()
 {
     //* currentPath 指出 exe 文件所在目录
-    QFile file(QDir::currentPath() + "/../map.txt");
+    QFile file(QDir::currentPath() + "/../res/map.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
@@ -64,7 +64,7 @@ void Map::loadMap()
                 break;
             }
             line.push_back(place);
-            place->setGeometry(j * 100 + 5, i * 100 + 5, 100, 100);
+            place->setGeometry(j * 100 + 10, i * 100 + 10, 100, 100);
             place->_id = QPair<size_t, size_t>(i, j);
         }
         _lines.push_back(line);

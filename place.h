@@ -89,7 +89,7 @@ class LowerPlace : public Place {
 public:
     LowerPlace(GameState* gamestate, QWidget* parent);
     bool isLower() override { return true; }
-    bool isReachable() { return true; }
+    bool isReachable() override { return true; }
 };
 
 //* 高地，编号 3

@@ -42,7 +42,10 @@ void GameState::deployOperator(size_t choice, Place* place)
     static size_t id_counter = 0;
     switch (choice) {
     case 0:
-        op = new TestOperator(place, _time, id_counter++, this);
+        op = new Irene(dynamic_cast<LowerPlace*>(place), _time, id_counter++, this);
+        break;
+    case 1:
+        op = new Kroos(dynamic_cast<HigherPlace*>(place), _time, id_counter++, this);
         break;
     }
     _active_operators.push_back(op);
@@ -107,5 +110,10 @@ Reunion* GameState::createRandomReunion()
 
 void deployOperator(GameState* gamestate, Place* place)
 {
-    gamestate->deployOperator(0, place);
+    static int cnt = 0;
+    if (cnt % 2 == 0)
+        gamestate->deployOperator(0, place);
+    else
+        gamestate->deployOperator(1, place);
+    cnt++;
 }
