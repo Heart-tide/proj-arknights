@@ -7,10 +7,6 @@
 
 class Place;
 
-namespace Ui {
-class Reunion;
-}
-
 class Reunion : public Infected {
     Q_OBJECT
 
@@ -28,13 +24,12 @@ public:
     virtual bool is_flying() { return false; }
     QString giveName() const override { return "Reunion"; }
 
+    void paintEvent(QPaintEvent*) override;
+
 protected:
     int _move_speed; //* 每步移动的距离
     QVector<Place*> _route;
     QPair<int, int> direction;
-
-private:
-    Ui::Reunion* ui;
 };
 
 class TestReunion : public Reunion {

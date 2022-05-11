@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QWidget>
 
+class GameState;
 class Map;
 class Infected;
 class Operator;
@@ -19,7 +20,7 @@ class Place : public QWidget {
 public:
     friend class Map;
 
-    Place(QWidget* parent);
+    Place(GameState* gamestate, QWidget* parent);
 
     virtual void addOperator(Infected* op);
     virtual void addReunion(Infected* reunion) { _reunions.push_back(reunion); }
@@ -36,6 +37,7 @@ public:
     void mousePressEvent(QMouseEvent* event) override;
 
 protected:
+    GameState* _gamestate;
     Infected* _op;
     QVector<Infected*> _reunions;
     QPair<size_t, size_t> _id;
@@ -47,7 +49,7 @@ protected:
 
 class UnreachablePlace : public Place {
 public:
-    UnreachablePlace(QWidget* parent);
+    UnreachablePlace(GameState* gamestate, QWidget* parent);
 
     void addOperator(Infected*) override { }
     void addReunion(Infected*) override { }
@@ -58,7 +60,7 @@ class Base : public UnreachablePlace {
     Q_OBJECT
 
 public:
-    Base(QWidget* parent);
+    Base(GameState* gamestate, QWidget* parent);
     bool isBase() override { return true; }
 };
 
@@ -66,7 +68,7 @@ class Entrance : public UnreachablePlace {
     Q_OBJECT
 
 public:
-    Entrance(QWidget* parent);
+    Entrance(GameState* gamestate, QWidget* parent);
     bool isEntrance() override { return true; }
 };
 

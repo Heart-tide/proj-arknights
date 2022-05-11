@@ -54,8 +54,6 @@ if(ANDROID)
 
     mainwindow.ui 
     map.ui 
-    operator.ui 
-    reunion.ui
   )
 else()
   add_executable(proj-arknights
@@ -80,8 +78,6 @@ else()
 
     mainwindow.ui 
     map.ui 
-    operator.ui 
-    reunion.ui
   )
 endif()
 

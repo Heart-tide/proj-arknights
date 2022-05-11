@@ -18,7 +18,7 @@ public:
 
     void update();
 
-    void deployOperator(size_t choice, size_t x, size_t y);
+    void deployOperator(size_t choice, Place* place);
     void operatorAction();
 
     void reunionStragegy();
@@ -44,5 +44,7 @@ private:
     size_t _speed;
     bool _is_paused;
 };
+
+void deployOperator(GameState* gamestate, Place* place);
 
 #endif // GAMESTATE_H

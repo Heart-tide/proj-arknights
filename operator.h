@@ -4,10 +4,6 @@
 #include "infected.h"
 #include <QWidget>
 
-namespace Ui {
-class Operator;
-}
-
 class Operator : public Infected {
     Q_OBJECT
 
@@ -25,11 +21,10 @@ public:
     virtual size_t giveCost() = 0;
     QString giveName() const override { return "Operator"; }
 
+    void paintEvent(QPaintEvent*) override;
+
 protected:
     size_t _block;
-
-private:
-    Ui::Operator* ui;
 };
 
 class TestOperator : public Operator {
@@ -41,6 +36,7 @@ public:
 
     size_t giveCost() override { return 0; }
     QString giveName() const override { return "TestOperator"; }
+    void paintEvent(QPaintEvent*) override;
 };
 
 #endif // OPERATOR_H

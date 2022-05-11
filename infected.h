@@ -12,7 +12,6 @@ class Infected : public QWidget {
     Q_OBJECT
 
 public:
-    Infected();
     Infected(size_t health, int damage, size_t interval,
         Place* place, size_t deployment_time, size_t id, QWidget* parent);
     virtual ~Infected() = default;
@@ -30,9 +29,11 @@ public:
     int giveHealth() { return _health; }
     bool isActive() { return _is_active; }
 
+    void paintEvent(QPaintEvent*) = 0;
+
 protected:
-    size_t _health;
-    const size_t _max_health;
+    int _health;
+    const int _max_health;
     int _damage;
     size_t _interval; //* 连续两次攻击的间隔tick数
     size_t _last_action_time;

@@ -1,11 +1,6 @@
 #include "infected.h"
 #include <ctime>
 
-Infected::Infected()
-    : _max_health(0)
-{
-}
-
 Infected::Infected(size_t health, int damage, size_t interval,
     Place* place, size_t deployment_time, size_t id, QWidget* parent)
     : QWidget(parent)

@@ -5,7 +5,10 @@
 #include <QPainter>
 #include <ctime>
 
-Map::Map(size_t height, size_t width)
+Map::Map(size_t height, size_t width, GameState* gamestate, QWidget* parent)
+    : QWidget(parent)
+    , _gamestate(gamestate)
+
 {
     loadMap(height, width);
     loadRoutes();
@@ -25,13 +28,13 @@ void Map::loadMap(size_t height, size_t width)
         for (size_t j = 0; j < width; j++) {
             Place* place = nullptr;
             if (i == 0 && j == width - 1) {
-                _entrance = new Entrance(this);
+                _entrance = new Entrance(_gamestate, this);
                 place = _entrance;
             } else if (i == height - 1 && j == 0) {
-                _base = new Base(this);
+                _base = new Base(_gamestate, this);
                 place = _base;
             } else {
-                place = new Place(this);
+                place = new Place(_gamestate, this);
             }
             line.push_back(place);
             place->setGeometry(j * 100 + 5, i * 100 + 5, 100, 100);

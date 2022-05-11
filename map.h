@@ -17,7 +17,7 @@ class Map : public QWidget {
 public:
     friend class GameState;
 
-    Map(size_t height, size_t width);
+    Map(size_t height, size_t width, GameState* gamestate, QWidget* parent);
     ~Map();
 
     QVector<Place*>& operator[](size_t i) { return _lines[i]; }
@@ -35,6 +35,7 @@ private:
 
     Ui::Map* ui;
 
+    GameState* _gamestate;
     QVector<QVector<Place*>> _lines;
     Base* _base;
     Entrance* _entrance;

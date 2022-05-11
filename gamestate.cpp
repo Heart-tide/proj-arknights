@@ -5,7 +5,7 @@
 
 GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_speed, QWidget* parent)
     : QWidget(parent)
-    , _map(new Map(5, 7))
+    , _map(new Map(5, 7, this, this))
     , _timer(new QTimer(this))
     , _reunion_stats(reunion_stats)
     , _create_interval(create_intervel)
@@ -16,9 +16,8 @@ GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_
     , _speed(default_speed)
     , _is_paused(false)
 {
-    _map->setParent(this);
     connect(_timer, &QTimer::timeout, this, &GameState::update);
-    _timer->start(10 / _speed); //* 10ms 更新一次！
+    _timer->start(20 / _speed); //* 20ms 更新一次！
 
     resize(static_cast<QWidget*>(this->parent())->size()); //* 将自身大小改为父对象大小
     _map->resize(static_cast<QWidget*>(this->parent())->size());
@@ -27,22 +26,23 @@ GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_
 //* update 函数，与 gamestate 计时器 connect
 void GameState::update()
 {
-    qDebug() << "[" << _time++ << "]";
+    // qDebug() << "[" << _time++ << "]";
+    _time++;
     reunionStragegy();
     reunionAction();
     operatorAction();
 }
 
 //* 部署一个 Operator 对象
-void GameState::deployOperator(size_t choice, size_t x, size_t y)
+void GameState::deployOperator(size_t choice, Place* place)
 {
-    if ((*_map)[x][y]->giveOperator() != nullptr) //* 一个格子最多只能有一个干员
+    if (place->giveOperator() != nullptr) //* 一个格子最多只能有一个干员
         return;
     Operator* op = nullptr;
     static size_t id_counter = 0;
     switch (choice) {
     case 0:
-        op = new TestOperator((*_map)[x][y], _time, id_counter++, this);
+        op = new TestOperator(place, _time, id_counter++, this);
         break;
     }
     _active_operators.push_back(op);
@@ -103,4 +103,9 @@ Reunion* GameState::createRandomReunion()
     default:
         return nullptr;
     }
+}
+
+void deployOperator(GameState* gamestate, Place* place)
+{
+    gamestate->deployOperator(0, place);
 }

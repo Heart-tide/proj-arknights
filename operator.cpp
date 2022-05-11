@@ -8,6 +8,9 @@ Operator::Operator(size_t health, int damage, size_t interval,
         deployment_time, id, parent)
     , _block(block)
 {
+    setGeometry(_place->x() - 15, _place->y(), 100, 100);
+    //? 要show才能调用绘图事件！！！
+    show();
 }
 
 void Operator::action(size_t time, QVector<Infected*>& reunions)
@@ -29,14 +32,17 @@ void Operator::action(size_t time, QVector<Infected*>& reunions)
         if (!attacked->isActive()) {
             qDebug() << "\tKILLED" << qPrintable(attacked->giveName())
                      << "#" << attacked->giveId();
+            attacked->hide();
         }
     }
+    update();
 }
 
 void Operator::addTo(Place* place)
 {
     _place = place;
     place->addOperator(this);
+    setGeometry(_place->x(), _place->y(), 100, 100);
 }
 
 void Operator::removeFrom()
@@ -45,9 +51,27 @@ void Operator::removeFrom()
     _place = nullptr;
 }
 
+//* 把血条画出来
+void Operator::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
+    QBrush red_brush(QColor("#EE0000"));
+    painter.setBrush(red_brush);
+    float rate = 1.0 * _health / _max_health;
+    painter.drawRect(10, 0, rate * 80, 5);
+}
+
 TestOperator::TestOperator(Place* place, size_t deployment_time,
     size_t id, QWidget* parent)
-    : Operator(100, 10, 5, place, deployment_time, id, parent, 3)
+    : Operator(100, 10, 20, place, deployment_time, id, parent, 3)
 {
     _place->addOperator(this);
+}
+
+void TestOperator::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    QPixmap Irene("://res/operator/Irene.png");
+    painter.drawPixmap(0, 0, 100, 100, Irene);
+    Operator::paintEvent(event);
 }
