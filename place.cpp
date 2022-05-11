@@ -52,7 +52,7 @@ HigherPlace::HigherPlace(GameState* gamestate, QWidget* parent)
 {
 }
 
-QString Place::giveId() const
+QString Place::giveID() const
 {
     return "[" + QString::number(_id.first)
         + "," + QString::number(_id.second) + "]";
@@ -62,7 +62,7 @@ void Place::mousePressEvent(QMouseEvent* event)
 {
     //? 小心生成了但没进 map 的格子，它们也占空间！！！
     //? 减少子父对象的层数，否则对象的覆盖关系会令人迷惑，并使得鼠标点击事件被父对象截获
-    qDebug() << giveId() << "监测到鼠标点击事件";
+    qDebug() << giveID() << "监测到鼠标点击事件";
     deployOperator(_gamestate, this);
 }
 

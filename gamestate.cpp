@@ -39,18 +39,19 @@ void GameState::deployOperator(size_t choice, Place* place)
     if (place->giveOperator() != nullptr) //* 一个格子最多只能有一个干员
         return;
     Operator* op = nullptr;
+    Orientation orientation = static_cast<Orientation>(_map->whichOrientation());
     static size_t id_counter = 0;
     switch (choice) {
     case 0:
-        op = new Irene(dynamic_cast<LowerPlace*>(place), _time, id_counter++, this);
+        op = new Irene(dynamic_cast<LowerPlace*>(place), _time, id_counter++, this, orientation);
         break;
     case 1:
-        op = new Kroos(dynamic_cast<HigherPlace*>(place), _time, id_counter++, this);
+        op = new Kroos(dynamic_cast<HigherPlace*>(place), _time, id_counter++, this, orientation);
         break;
     }
     _active_operators.push_back(op);
     qDebug() << "\tCREATE" << qPrintable(op->giveName()) << "#"
-             << op->giveId() << "|" << qPrintable(op->givePlace()->giveId());
+             << op->giveID() << "|" << qPrintable(op->givePlace()->giveID());
 }
 
 //* 场上所有 active 的 operator 按其生成次序行动
@@ -58,13 +59,60 @@ void GameState::operatorAction()
 {
     QVector<Operator*> still_active;
     for (auto it = _active_operators.begin(); it < _active_operators.end(); it++) {
-        //! TODO 暂时干员只能攻击与自己同格子的单位
         if ((*it)->isActive()) {
-            (*it)->action(_time, (*it)->givePlace()->giveReunions());
+            (*it)->action(_time, properAttackedReunion(*it));
             still_active.push_back(*it);
         }
     }
     _active_operators = still_active;
+}
+
+//* 计算干员可攻击到的敌人
+Infected* GameState::properAttackedReunion(Operator* op) const
+{
+    int x = 0, y = 0, height = 0, width = 0;
+    switch (op->giveOrientation()) {
+    case UP:
+        height = op->giveAttackArea().second;
+        width = op->giveAttackArea().first;
+        x = op->givePlace()->showID().second - width / 2;
+        y = op->givePlace()->showID().first - (height - 1);
+        break;
+    case DOWN:
+        height = op->giveAttackArea().second;
+        width = op->giveAttackArea().first;
+        x = op->givePlace()->showID().second - width / 2;
+        y = op->givePlace()->showID().first;
+        break;
+    case LEFT:
+        height = op->giveAttackArea().first;
+        width = op->giveAttackArea().second;
+        x = op->givePlace()->showID().second - (width - 1);
+        y = op->givePlace()->showID().first - height / 2;
+        break;
+    case RIGHT:
+        height = op->giveAttackArea().first;
+        width = op->giveAttackArea().second;
+        x = op->givePlace()->showID().second;
+        y = op->givePlace()->showID().first - height / 2;
+        break;
+    }
+    //* 先列后行进行遍历
+    //? 从 先行后列 到 先x后y 的转换，需要多加注意！以后都应写成 先x后y，更通用。
+    for (int i = x; i < x + width; i++) {
+        if (i < 0 || i >= _map->giveWidth()) {
+            continue;
+        }
+        for (int j = y; j < y + height; j++) {
+            if (j < 0 || j >= _map->giveHeight()) {
+                continue;
+            }
+            if (!(*_map)[j][i]->giveReunions().empty()) {
+                return (*_map)[j][i]->giveReunions()[0];
+            }
+        }
+    }
+    return nullptr;
 }
 
 //* 生成 Reunion
@@ -77,7 +125,7 @@ void GameState::reunionStragegy()
     reunion->addTo(_map->_entrance);
     _active_reunions.push_back(reunion);
     qDebug() << "\tCREATE" << qPrintable(reunion->giveName()) << "#"
-             << reunion->giveId() << "|" << qPrintable(reunion->givePlace()->giveId());
+             << reunion->giveID() << "|" << qPrintable(reunion->givePlace()->giveID());
 }
 
 //* 场上所有 active 的 Reunion 按其生成次序行动
@@ -108,12 +156,22 @@ Reunion* GameState::createRandomReunion()
     }
 }
 
+//* 当点击一个格子时调用，若符合条件，则放置一个干员
 void deployOperator(GameState* gamestate, Place* place)
 {
-    static int cnt = 0;
-    if (cnt % 2 == 0)
-        gamestate->deployOperator(0, place);
-    else
-        gamestate->deployOperator(1, place);
-    cnt++;
+    int choice = gamestate->_map->whichOperator();
+    switch (choice) {
+    case -1:
+        return;
+    case 0:
+        if (place->isLower()) {
+            gamestate->deployOperator(choice, place);
+        }
+        break;
+    case 1:
+        if (place->isHigher()) {
+            gamestate->deployOperator(choice, place);
+        }
+        break;
+    }
 }

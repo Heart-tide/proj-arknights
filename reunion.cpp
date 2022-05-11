@@ -30,14 +30,14 @@ void Reunion::action(size_t time, size_t& hp, Infected* op)
         _last_action_time = time;
         op->reduceHealth(_damage);
         qDebug() << "\tATTACK" << qPrintable(giveName())
-                 << "#" << giveId()
+                 << "#" << giveID()
                  << "***" << qPrintable(op->giveName())
-                 << "#" << op->giveId()
+                 << "#" << op->giveID()
                  << "HHH -" << _damage
                  << ">>" << op->giveHealth();
         if (!op->isActive()) {
             qDebug() << "\tKILLED" << qPrintable(op->giveName())
-                     << "#" << op->giveId();
+                     << "#" << op->giveID();
             op->hide();
         }
     } else {
@@ -50,7 +50,7 @@ void Reunion::action(size_t time, size_t& hp, Infected* op)
             direction.first = (_route.back()->x() - _place->x()) / 100 * _move_speed;
             direction.second = (_route.back()->y() - _place->y()) / 100 * _move_speed;
             if (_place->isBase()) {
-                qDebug() << "\tGETINTOBASE" << qPrintable(giveName()) << "#" << giveId();
+                qDebug() << "\tGETINTOBASE" << qPrintable(giveName()) << "#" << giveID();
                 _is_active = false;
                 hp--;
             }
@@ -79,11 +79,13 @@ void Reunion::paintEvent(QPaintEvent*)
     painter.setBrush(red_brush);
     float rate = 1.0 * _health / _max_health;
     painter.drawRect(10, 10, rate * 80, 5);
+    painter.setPen(QPen(Qt::gray, 5));
+    painter.drawText(10, 10, QString::number(_health) + " / " + QString::number(_max_health));
 }
 
 TestReunion::TestReunion(Place* place, size_t deployment_time,
     size_t id, QVector<Place*> route, QWidget* parent)
-    : Reunion(50, 34, 50, place, deployment_time, 2, id, route, parent) //* 原石虫攻击力限时 UP !
+    : Reunion(50, 17, 30, place, deployment_time, 2, id, route, parent) //* 原石虫攻击力限时 UP !
 {
 }
 

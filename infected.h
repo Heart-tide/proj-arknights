@@ -24,7 +24,7 @@ public:
     virtual QString giveName() const { return "Infected"; }
     virtual size_t giveCost() { return 0; }
 
-    size_t giveId() const { return _id; }
+    size_t giveID() const { return _id; }
     Place* givePlace() { return _place; }
     int giveHealth() { return _health; }
     bool isActive() { return _is_active; }

@@ -6,5 +6,7 @@
         <file>res/place/higher.png</file>
         <file>res/place/lower.png</file>
         <file>res/operator/Kroos.png</file>
+        <file>res/photo/Irene.png</file>
+        <file>res/photo/Kroos.png</file>
     </qresource>
 </RCC>

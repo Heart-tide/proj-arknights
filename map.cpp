@@ -11,8 +11,11 @@
 Map::Map(GameState* gamestate, QWidget* parent)
     : QWidget(parent)
     , _gamestate(gamestate)
-
+    , ui(new Ui::Map)
 {
+    ui->setupUi(this);
+    ui->button_empty->setChecked(true);
+    ui->button_up->setChecked(true);
     loadMap();
     loadRoutes();
     qDebug() << giveHeight() << "*" << giveWidth() << "大小的地图已生成";
@@ -22,6 +25,30 @@ Map::Map(GameState* gamestate, QWidget* parent)
 Map::~Map()
 {
     delete ui;
+}
+
+int Map::whichOperator() const
+{
+    if (ui->button_empty->isChecked()) {
+        return -1;
+    } else if (ui->button_irene->isChecked()) {
+        return 0;
+    } else if (ui->button_kroos->isChecked()) {
+        return 1;
+    }
+}
+
+int Map::whichOrientation() const
+{
+    if (ui->button_up->isChecked()) {
+        return 0;
+    } else if (ui->button_down->isChecked()) {
+        return 1;
+    } else if (ui->button_left->isChecked()) {
+        return 2;
+    } else if (ui->button_right->isChecked()) {
+        return 3;
+    }
 }
 
 void Map::loadMap()
@@ -64,7 +91,7 @@ void Map::loadMap()
                 break;
             }
             line.push_back(place);
-            place->setGeometry(j * 100 + 10, i * 100 + 10, 100, 100);
+            place->setGeometry(j * 100, i * 100 + 5, 100, 100);
             place->_id = QPair<size_t, size_t>(i, j);
         }
         _lines.push_back(line);

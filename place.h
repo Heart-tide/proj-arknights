@@ -35,7 +35,8 @@ public:
 
     Infected* giveOperator() { return _op; }
     QVector<Infected*>& giveReunions() { return _reunions; }
-    QString giveId() const;
+    QString giveID() const; //* 返回 QString 数据
+    QPair<size_t, size_t> showID() const { return _id; } //* 返回 id 本身
 
     void mousePressEvent(QMouseEvent* event) override;
 

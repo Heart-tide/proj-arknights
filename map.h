@@ -8,9 +8,12 @@
 class GameState;
 
 //* 一张地图，由很多行组成
-namespace Ui {
-class Map;
+QT_BEGIN_NAMESPACE namespace Ui
+{
+    class Map;
 }
+QT_END_NAMESPACE
+
 class Map : public QWidget {
     Q_OBJECT
 
@@ -26,6 +29,9 @@ public:
     size_t giveHeight() const { return _lines.size(); }
     size_t giveWidth() const { return _lines.empty() ? 0 : _lines[0].size(); }
     QVector<Place*> giveRandomRoute() const;
+
+    int whichOperator() const;
+    int whichOrientation() const;
 
     void paintEvent(QPaintEvent*) override;
 

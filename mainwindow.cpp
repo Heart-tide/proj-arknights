@@ -8,9 +8,9 @@ MainWindow::MainWindow(QWidget* parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    resize(800, 600);
+    resize(700, 605);
     setWindowTitle("Arknights");
-    new GameState(100, 200, 100, 1, this);
+    new GameState(20, 100, 100, 1, this);
 }
 
 MainWindow::~MainWindow()

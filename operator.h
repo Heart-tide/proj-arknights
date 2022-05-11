@@ -2,7 +2,13 @@
 #define OPERATOR_H
 
 #include "infected.h"
+#include <QPair>
 #include <QWidget>
+
+enum Orientation { UP,
+    DOWN,
+    LEFT,
+    RIGHT };
 
 class Operator : public Infected {
     Q_OBJECT
@@ -10,19 +16,24 @@ class Operator : public Infected {
 public:
     Operator(size_t health, int damage, size_t interval,
         Place* place, size_t deployment_time, size_t id,
-        QWidget* parent, size_t block);
-    ~Operator() = default;
+        QWidget* parent, size_t block, Orientation orientation);
 
-    void action(size_t time, QVector<Infected*>& reunions);
+    void action(size_t time, Infected* attacked);
 
     void addTo(Place* place) override;
     void removeFrom() override;
 
     virtual size_t giveCost() = 0;
     QString giveName() const override { return "Operator"; }
+    Orientation giveOrientation() const { return _orientation; }
+    //* 假设向右部署，干员的矩形攻击范围的 height, width 大小
+    virtual QPair<int, int> giveAttackArea() const { return QPair<int, int>(1, 1); }
+
+    void paintEvent(QPaintEvent*) override;
 
 protected:
     size_t _block;
+    Orientation _orientation;
 };
 
 //************* 狙击手 *************
@@ -32,9 +43,9 @@ class Sniper : public Operator {
 public:
     Sniper(size_t health, int damage, size_t interval,
         HigherPlace* higher_place, size_t deployment_time,
-        size_t id, QWidget* parent);
+        size_t id, QWidget* parent, Orientation orientation);
 
-    void paintEvent(QPaintEvent*) override;
+    QPair<int, int> giveAttackArea() const override { return QPair<int, int>(3, 3); }
 };
 
 class Kroos : public Sniper {
@@ -42,7 +53,7 @@ class Kroos : public Sniper {
 
 public:
     Kroos(HigherPlace* higher_place, size_t deployment_time,
-        size_t id, QWidget* parent);
+        size_t id, QWidget* parent, Orientation orientation);
 
     size_t giveCost() override { return 0; }
     QString giveName() const override { return "Kroos"; }
@@ -56,9 +67,9 @@ class Guard : public Operator {
 public:
     Guard(size_t health, int damage, size_t interval,
         LowerPlace* lower_place, size_t deployment_time,
-        size_t id, QWidget* parent, size_t block);
+        size_t id, QWidget* parent, size_t block, Orientation orientation);
 
-    void paintEvent(QPaintEvent*) override;
+    QPair<int, int> giveAttackArea() const override { return QPair<int, int>(1, 2); }
 };
 
 class Irene : public Guard {
@@ -66,7 +77,7 @@ class Irene : public Guard {
 
 public:
     Irene(LowerPlace* lower_place, size_t deployment_time,
-        size_t id, QWidget* parent);
+        size_t id, QWidget* parent, Orientation orientation);
 
     size_t giveCost() override { return 0; }
     QString giveName() const override { return "Irene"; }
