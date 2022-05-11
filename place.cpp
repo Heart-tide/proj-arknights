@@ -42,6 +42,16 @@ Entrance::Entrance(GameState* gamestate, QWidget* parent)
 {
 }
 
+LowerPlace::LowerPlace(GameState* gamestate, QWidget* parent)
+    : Place(gamestate, parent)
+{
+}
+
+HigherPlace::HigherPlace(GameState* gamestate, QWidget* parent)
+    : Place(gamestate, parent)
+{
+}
+
 QString Place::giveId() const
 {
     return "[" + QString::number(_id.first)

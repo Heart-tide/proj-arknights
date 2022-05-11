@@ -5,7 +5,7 @@
 
 GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_speed, QWidget* parent)
     : QWidget(parent)
-    , _map(new Map(5, 7, this, this))
+    , _map(new Map(this, this))
     , _timer(new QTimer(this))
     , _reunion_stats(reunion_stats)
     , _create_interval(create_intervel)

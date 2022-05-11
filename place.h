@@ -29,6 +29,9 @@ public:
 
     virtual bool isBase() { return false; }
     virtual bool isEntrance() { return false; }
+    virtual bool isLower() { return false; }
+    virtual bool isHigher() { return false; }
+    virtual bool isReachable() { return false; }
 
     Infected* giveOperator() { return _op; }
     QVector<Infected*>& giveReunions() { return _reunions; }
@@ -47,7 +50,10 @@ protected:
 
 //* 这里是不可到达地块
 
+//* 不可到达，编号 4
 class UnreachablePlace : public Place {
+    Q_OBJECT
+
 public:
     UnreachablePlace(GameState* gamestate, QWidget* parent);
 
@@ -56,6 +62,7 @@ public:
     void removeOperator() override { }
     void removeReunion(Infected*) override { }
 };
+//* 我方基地，编号 0
 class Base : public UnreachablePlace {
     Q_OBJECT
 
@@ -64,12 +71,34 @@ public:
     bool isBase() override { return true; }
 };
 
+//* 敌方入口，编号 1
 class Entrance : public UnreachablePlace {
     Q_OBJECT
 
 public:
     Entrance(GameState* gamestate, QWidget* parent);
     bool isEntrance() override { return true; }
+};
+
+//* 这里是低地和高地
+
+//* 低地，编号 2
+class LowerPlace : public Place {
+    Q_OBJECT
+
+public:
+    LowerPlace(GameState* gamestate, QWidget* parent);
+    bool isLower() override { return true; }
+    bool isReachable() { return true; }
+};
+
+//* 高地，编号 3
+class HigherPlace : public Place {
+    Q_OBJECT
+
+public:
+    HigherPlace(GameState* gamestate, QWidget* parent);
+    bool isHigher() override { return true; }
 };
 
 #endif // PLACE_H

@@ -17,7 +17,7 @@ class Map : public QWidget {
 public:
     friend class GameState;
 
-    Map(size_t height, size_t width, GameState* gamestate, QWidget* parent);
+    Map(GameState* gamestate, QWidget* parent);
     ~Map();
 
     QVector<Place*>& operator[](size_t i) { return _lines[i]; }
@@ -30,7 +30,7 @@ public:
     void paintEvent(QPaintEvent*) override;
 
 private:
-    void loadMap(size_t height, size_t width);
+    void loadMap();
     void loadRoutes(); //* 只按坐标保存路径，载入时换算成Place*链表
 
     Ui::Map* ui;

@@ -3,5 +3,7 @@
         <file>res/place/jia.jpg</file>
         <file>res/reunion/yuan.png</file>
         <file>res/operator/Irene.png</file>
+        <file>res/place/higher.png</file>
+        <file>res/place/lower.png</file>
     </qresource>
 </RCC>
