@@ -2,6 +2,7 @@
 #define INFECTED_H
 
 #include "place.h"
+#include <QException>
 #include <QPainter>
 #include <QString>
 #include <QWidget>
@@ -46,5 +47,24 @@ protected:
 };
 
 Infected* giveRandomInfected(QVector<Infected*>& infecteds);
+
+//**************** 胜利和失败条件 ****************
+class GameOverException : public QException {
+public:
+    void raise() const override { throw *this; }
+    GameOverException* clone() const override { return new GameOverException(*this); }
+};
+
+class WinException : public GameOverException {
+public:
+    void raise() const override { throw *this; }
+    WinException* clone() const override { return new WinException(*this); }
+};
+
+class LoseException : public GameOverException {
+public:
+    void raise() const override { throw *this; }
+    LoseException* clone() const override { return new LoseException(*this); }
+};
 
 #endif // INFECTED_H

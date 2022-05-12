@@ -16,7 +16,7 @@ public:
     friend void deployOperator(GameState* gamestate, Place* place);
 
     GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_speed, QWidget* parent);
-    ~GameState() = default;
+    void connectWithWidgets();
 
     void update();
 
@@ -28,15 +28,13 @@ public:
     void reunionAction();
     Reunion* createRandomReunion();
 
-    //! TODO win && lose
-
 private:
     Map* _map;
     QTimer* _timer;
     QVector<Operator*> _active_operators;
     QVector<Reunion*> _active_reunions;
 
-    size_t _reunion_stats; //* 剩余敌人个数
+    size_t _enemy_stats; //* 剩余敌人个数
     size_t _create_interval;
     size_t _reunion_dp;
 
@@ -45,7 +43,7 @@ private:
     size_t _hp;
 
     size_t _speed;
-    bool _is_paused;
+    bool _gameover;
 };
 
 void deployOperator(GameState* gamestate, Place* place);

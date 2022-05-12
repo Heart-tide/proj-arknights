@@ -1,5 +1,7 @@
 #include "gamestate.h"
+#include "ui_map.h"
 #include <QDebug>
+#include <QDialog>
 #include <QString>
 #include <ctime>
 
@@ -7,15 +9,17 @@ GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_
     : QWidget(parent)
     , _map(new Map(this, this))
     , _timer(new QTimer(this))
-    , _reunion_stats(reunion_stats)
+    , _enemy_stats(reunion_stats)
     , _create_interval(create_intervel)
     , _reunion_dp(0)
     , _time(0)
     , _dp(0)
     , _hp(total_hp)
     , _speed(default_speed)
-    , _is_paused(false)
+    , _gameover(false)
 {
+    connectWithWidgets();
+
     connect(_timer, &QTimer::timeout, this, &GameState::update);
     _timer->start(20 / _speed); //* 20ms 更新一次！
 
@@ -23,14 +27,51 @@ GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_
     _map->resize(static_cast<QWidget*>(this->parent())->size());
 }
 
+//* 与 ui 中所有的控件 connect
+void GameState::connectWithWidgets()
+{
+    auto ui = _map->ui;
+    connect(ui->push_speed, &QPushButton::clicked, this, [=]() {
+        _speed = 3 - _speed;
+        _timer->setInterval(20 / _speed);
+        ui->push_speed->setText(QString("Speed %1x").arg(_speed));
+    });
+    connect(ui->push_pause, &QPushButton::clicked, this, [=]() {
+        if (_timer->isActive()) {
+            _timer->stop();
+            ui->push_pause->setText("Resume");
+        } else if (!_timer->isActive() && !_gameover) {
+            _timer->start();
+            ui->push_pause->setText("Pause");
+        }
+    });
+}
+
 //* update 函数，与 gamestate 计时器 connect
 void GameState::update()
 {
     // qDebug() << "[" << _time++ << "]";
     _time++;
-    reunionStragegy();
-    reunionAction();
-    operatorAction();
+    _dp += (_time % 50 == 0); //* 每 50 帧增加一费
+    try {
+        reunionStragegy();
+        reunionAction();
+        operatorAction();
+    } catch (WinException& e) {
+        _timer->stop();
+        _gameover = true;
+        //* C++ 11 的 Raw String Literals，有助于更方便地书写字符串字面量：R"(……)"，中间可加换行
+        _map->ui->label_state->setText(R"(<html><head /><body><p align = "center">
+            <span style = " font-size:16pt; font-weight:600;">YOU WIN</ span></ p></ body></ html>)");
+    } catch (LoseException& e) {
+        _timer->stop();
+        _gameover = true;
+        _map->ui->label_state->setText(R"(<html><head/><body><p align="center">
+            <span style=" font-size:16pt; font-weight:600;">YOU LOSE</span></p></body></html>)");
+    }
+    _map->ui->label_enemy_stats->setText(QString::number(_enemy_stats + _active_reunions.size()));
+    _map->ui->label_hp->setText(QString::number(_hp));
+    _map->ui->label_dp->setText(QString::number(_dp));
 }
 
 //* 部署一个 Operator 对象
@@ -118,9 +159,9 @@ Infected* GameState::properAttackedReunion(Operator* op) const
 //* 生成 Reunion
 void GameState::reunionStragegy()
 {
-    if (_time % _create_interval != 1 || _reunion_stats == 0)
+    if (_time % _create_interval != 1 || _enemy_stats == 0)
         return;
-    _reunion_stats--;
+    _enemy_stats--;
     auto reunion = createRandomReunion();
     reunion->addTo(_map->_entrance);
     _active_reunions.push_back(reunion);
@@ -138,6 +179,9 @@ void GameState::reunionAction()
             (*it)->action(_time, _hp, (*it)->givePlace()->giveOperator());
             still_active.push_back(*it);
         }
+    }
+    if (still_active.empty() && _enemy_stats == 0) {
+        throw WinException();
     }
     _active_reunions = still_active;
 }

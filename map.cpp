@@ -19,7 +19,7 @@ Map::Map(GameState* gamestate, QWidget* parent)
     loadMap();
     loadRoutes();
     qDebug() << giveHeight() << "*" << giveWidth() << "大小的地图已生成";
-    qDebug() << "游戏开始了哦!\n";
+    qDebug() << "游戏开始了哦!";
 }
 
 Map::~Map()

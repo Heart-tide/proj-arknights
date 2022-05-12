@@ -52,7 +52,9 @@ void Reunion::action(size_t time, size_t& hp, Infected* op)
             if (_place->isBase()) {
                 qDebug() << "\tGETINTOBASE" << qPrintable(giveName()) << "#" << giveID();
                 _is_active = false;
-                hp--;
+                if (--hp == 0) {
+                    throw LoseException();
+                }
             }
         }
     }
