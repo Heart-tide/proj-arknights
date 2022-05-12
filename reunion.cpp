@@ -87,7 +87,7 @@ void Reunion::paintEvent(QPaintEvent*)
 
 TestReunion::TestReunion(Place* place, size_t deployment_time,
     size_t id, QVector<Place*> route, QWidget* parent)
-    : Reunion(50, 17, 30, place, deployment_time, 2, id, route, parent) //* 原石虫攻击力限时 UP !
+    : Reunion(50, 20, 30, place, deployment_time, 2, id, route, parent) //* 原石虫攻击力限时 UP !
 {
 }
 
@@ -97,4 +97,10 @@ void TestReunion::paintEvent(QPaintEvent* event)
     QPixmap yuan("://res/reunion/yuan.png");
     painter.drawPixmap(0, 0, 100, 100, yuan);
     Reunion::paintEvent(event);
+}
+
+//* 将对整合运动的鼠标点击传递给其所在的地面
+void Reunion::mousePressEvent(QMouseEvent* event)
+{
+    return _place->mousePressEvent(event);
 }

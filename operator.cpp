@@ -135,7 +135,7 @@ Kroos::Kroos(HigherPlace* higher_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Sniper(100, 5, 20, higher_place, deployment_time, id, parent, orientation)
+    : Sniper(20, 4, 20, higher_place, deployment_time, id, parent, orientation)
 {
 }
 

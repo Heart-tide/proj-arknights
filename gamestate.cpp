@@ -84,12 +84,20 @@ void GameState::deployOperator(size_t choice, Place* place)
     static size_t id_counter = 0;
     switch (choice) {
     case 0:
-        op = new Irene(dynamic_cast<LowerPlace*>(place), _time, id_counter++, this, orientation);
+        if (Irene::cost <= _dp) {
+            op = new Irene(dynamic_cast<LowerPlace*>(place), _time, id_counter++, this, orientation);
+        }
         break;
     case 1:
-        op = new Kroos(dynamic_cast<HigherPlace*>(place), _time, id_counter++, this, orientation);
+        if (Kroos::cost <= _dp) {
+            op = new Kroos(dynamic_cast<HigherPlace*>(place), _time, id_counter++, this, orientation);
+        }
         break;
     }
+    if (op == nullptr) {
+        return;
+    }
+    _dp -= op->giveCost();
     _active_operators.push_back(op);
     qDebug() << "\tCREATE" << qPrintable(op->giveName()) << "#"
              << op->giveID() << "|" << qPrintable(op->givePlace()->giveID());

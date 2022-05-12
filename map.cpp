@@ -54,7 +54,7 @@ int Map::whichOrientation() const
 void Map::loadMap()
 {
     //* currentPath 指出 exe 文件所在目录
-    QFile file(QDir::currentPath() + "/../res/map.txt");
+    QFile file(QDir::currentPath() + "/map.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
