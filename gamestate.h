@@ -13,14 +13,14 @@ class GameState : public QWidget {
     Q_OBJECT
 
 public:
-    friend void deployOperator(GameState* gamestate, Place* place);
+    friend void deployOperator(GameState* gamestate, Place* place, int orientation);
 
     GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_speed, QWidget* parent);
     void connectWithWidgets();
 
     void update();
 
-    void deployOperator(size_t choice, Place* place);
+    void deployOperator(size_t choice, Place* place, Orientation orientation);
     void operatorAction();
     Infected* properAttackedReunion(Operator* op) const;
 
@@ -46,6 +46,6 @@ private:
     bool _gameover;
 };
 
-void deployOperator(GameState* gamestate, Place* place);
+void deployOperator(GameState* gamestate, Place* place, int orientation);
 
 #endif // GAMESTATE_H

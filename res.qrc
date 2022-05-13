@@ -8,5 +8,12 @@
         <file>res/operator/Kroos.png</file>
         <file>res/photo/Irene.png</file>
         <file>res/photo/Kroos.png</file>
+        <file>res/photo/enemy_stats.png</file>
+        <file>res/photo/hp.png</file>
+        <file>res/photo/dp.png</file>
+        <file>res/photo/continue.png</file>
+        <file>res/photo/speed_1x.png</file>
+        <file>res/photo/speed_2x.png</file>
+        <file>res/photo/stop.png</file>
     </qresource>
 </RCC>

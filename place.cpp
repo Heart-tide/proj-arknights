@@ -1,12 +1,11 @@
 #include "place.h"
-#include <QDebug>
 #include <QImage>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPixmap>
 #include <QString>
 
-extern void deployOperator(GameState* gamestate, Place* place);
+extern void deployOperator(GameState* gamestate, Place* place, int orientation);
 
 Place::Place(GameState* gamestate, QWidget* parent)
     : QWidget(parent)
@@ -62,8 +61,32 @@ void Place::mousePressEvent(QMouseEvent* event)
 {
     //? 小心生成了但没进 map 的格子，它们也占空间！！！
     //? 减少子父对象的层数，否则对象的覆盖关系会令人迷惑，并使得鼠标点击事件被父对象截获
-    qDebug() << giveID() << "监测到鼠标点击事件";
-    deployOperator(_gamestate, this);
+    if (event->button() == Qt::LeftButton) {
+        _prees_point = event->pos();
+    }
+}
+
+void Place::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (event->button() != Qt::LeftButton) {
+        return;
+    }
+    int delta_x = event->x() - _prees_point.x();
+    int delta_y = event->y() - _prees_point.y();
+    if (abs(delta_x) > abs(delta_y)) {
+        if (delta_x > 0) {
+            deployOperator(_gamestate, this, 3);
+        } else {
+            deployOperator(_gamestate, this, 2);
+        }
+    }
+    if (abs(delta_x) < abs(delta_y)) {
+        if (delta_y > 0) {
+            deployOperator(_gamestate, this, 1);
+        } else {
+            deployOperator(_gamestate, this, 0);
+        }
+    }
 }
 
 UnreachablePlace::UnreachablePlace(GameState* gamestate, QWidget* parent)

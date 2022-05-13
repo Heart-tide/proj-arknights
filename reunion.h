@@ -26,6 +26,7 @@ public:
 
     void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
 
 protected:
     int _move_speed; //* 每步移动的距离

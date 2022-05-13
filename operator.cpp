@@ -1,5 +1,4 @@
 #include "operator.h"
-#include <QDebug>
 
 Operator::Operator(size_t health,
     int damage,
@@ -26,17 +25,21 @@ void Operator::action(size_t time, Infected* attacked)
     }
     if (attacked) { //* 暂时无视阻挡数要求
         _last_action_time = time;
+        auto attacked_place = attacked->givePlace();
         //* 类的函数不一定都是成员函数，定义在类外有时不失为一种选择
         attacked->reduceHealth(_damage);
-        qDebug() << "\tATTACK" << qPrintable(giveName())
-                 << "#" << giveID()
-                 << "***" << qPrintable(attacked->giveName())
-                 << "#" << attacked->giveID()
-                 << "HHH -" << _damage
-                 << ">>" << attacked->giveHealth();
+        // qDebug() << "\tATTACK" << qPrintable(giveName())
+        //          << "#" << giveID()
+        //          << "***" << qPrintable(attacked->giveName())
+        //          << "#" << attacked->giveID()
+        //          << "HHH -" << _damage
+        //          << ">>" << attacked->giveHealth();
         if (!attacked->isActive()) {
-            qDebug() << "\tKILLED" << qPrintable(attacked->giveName())
-                     << "#" << attacked->giveID();
+            printLog(QString("KILL %1%2 --> %3%4")
+                         .arg(giveName())
+                         .arg(_place->giveID())
+                         .arg(attacked->giveName())
+                         .arg(attacked_place->giveID()));
             attacked->hide();
         }
         update();

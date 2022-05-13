@@ -1,7 +1,7 @@
 #ifndef INFECTED_H
 #define INFECTED_H
 
-#include "place.h"
+#include "map.h"
 #include <QException>
 #include <QPainter>
 #include <QString>

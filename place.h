@@ -2,6 +2,7 @@
 #define PLACE_H
 
 #include <QPair>
+#include <QPoint>
 #include <QString>
 #include <QVector>
 #include <QWidget>
@@ -39,12 +40,14 @@ public:
     QPair<size_t, size_t> showID() const { return _id; } //* 返回 id 本身
 
     void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
 
 protected:
     GameState* _gamestate;
     Infected* _op;
     QVector<Infected*> _reunions;
     QPair<size_t, size_t> _id;
+    QPoint _prees_point;
 };
 
 //************* Place 有三个子类：不可到达的地块、低地、高地 *************

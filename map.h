@@ -19,8 +19,11 @@ class Map : public QWidget {
 
 public:
     friend class GameState;
+    friend void deployOperator(GameState* gamestate, Place* place, int orientation);
+    friend void printLog(const QString& str, Map* map_init);
 
     Map(GameState* gamestate, QWidget* parent);
+    void connectOperators();
     ~Map();
 
     QVector<Place*>& operator[](size_t i) { return _lines[i]; }
@@ -29,9 +32,6 @@ public:
     size_t giveHeight() const { return _lines.size(); }
     size_t giveWidth() const { return _lines.empty() ? 0 : _lines[0].size(); }
     QVector<Place*> giveRandomRoute() const;
-
-    int whichOperator() const;
-    int whichOrientation() const;
 
     void paintEvent(QPaintEvent*) override;
 
@@ -46,6 +46,9 @@ private:
     Base* _base;
     Entrance* _entrance;
     QVector<QVector<Place*>> _routes;
+    int _operatorSelected;
 };
+
+void printLog(const QString& str, Map* map_init = nullptr);
 
 #endif // MAP_H

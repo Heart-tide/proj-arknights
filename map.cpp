@@ -1,6 +1,5 @@
 #include "map.h"
 #include "ui_map.h"
-#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QMouseEvent>
@@ -12,14 +11,14 @@ Map::Map(GameState* gamestate, QWidget* parent)
     : QWidget(parent)
     , _gamestate(gamestate)
     , ui(new Ui::Map)
+    , _operatorSelected(-1)
 {
     ui->setupUi(this);
-    ui->button_empty->setChecked(true);
-    ui->button_up->setChecked(true);
+    connectOperators();
     loadMap();
     loadRoutes();
-    qDebug() << giveHeight() << "*" << giveWidth() << "大小的地图已生成";
-    qDebug() << "游戏开始了哦!";
+    printLog(QString("地图生成成功, 大小 %1 * %2").arg(giveHeight()).arg(giveWidth()));
+    printLog("游戏开始了哦!");
 }
 
 Map::~Map()
@@ -27,28 +26,16 @@ Map::~Map()
     delete ui;
 }
 
-int Map::whichOperator() const
+void Map::connectOperators()
 {
-    if (ui->button_empty->isChecked()) {
-        return -1;
-    } else if (ui->button_irene->isChecked()) {
-        return 0;
-    } else if (ui->button_kroos->isChecked()) {
-        return 1;
-    }
-}
-
-int Map::whichOrientation() const
-{
-    if (ui->button_up->isChecked()) {
-        return 0;
-    } else if (ui->button_down->isChecked()) {
-        return 1;
-    } else if (ui->button_left->isChecked()) {
-        return 2;
-    } else if (ui->button_right->isChecked()) {
-        return 3;
-    }
+    connect(ui->photo_irene, &QPushButton::clicked, this, [=]() {
+        _operatorSelected = 0;
+        printLog(QString("CHOOSE Irene"));
+    });
+    connect(ui->photo_kroos, &QPushButton::clicked, this, [=]() {
+        _operatorSelected = 1;
+        printLog(QString("CHOOSE Kroos"));
+    });
 }
 
 void Map::loadMap()
@@ -58,7 +45,7 @@ void Map::loadMap()
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
-    qDebug() << "Open file successfully!!!";
+    printLog("地图文件读取成功!", this);
     QTextStream in(&file);
     size_t height = 0;
     size_t width = 0;
@@ -126,6 +113,17 @@ void Map::loadRoutes()
             }
         }
         _routes.push_back(route);
+    }
+}
+
+void printLog(const QString& str, Map* map_init)
+{
+    static Map* map = nullptr;
+    if (map_init != nullptr) {
+        map = map_init;
+    }
+    if (map != nullptr) {
+        map->ui->text_log->appendPlainText(str);
     }
 }
 

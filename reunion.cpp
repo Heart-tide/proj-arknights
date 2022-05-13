@@ -1,5 +1,4 @@
 #include "reunion.h"
-#include <QDebug>
 
 Reunion::Reunion(size_t health, int damage, size_t interval,
     Place* place, size_t deployment_time, size_t move_speed,
@@ -28,16 +27,20 @@ void Reunion::action(size_t time, size_t& hp, Infected* op)
         if (time - _last_action_time < _interval)
             return;
         _last_action_time = time;
+        auto op_place = op->givePlace();
         op->reduceHealth(_damage);
-        qDebug() << "\tATTACK" << qPrintable(giveName())
-                 << "#" << giveID()
-                 << "***" << qPrintable(op->giveName())
-                 << "#" << op->giveID()
-                 << "HHH -" << _damage
-                 << ">>" << op->giveHealth();
+        // qDebug() << "\tATTACK" << qPrintable(giveName())
+        //          << "#" << giveID()
+        //          << "***" << qPrintable(op->giveName())
+        //          << "#" << op->giveID()
+        //          << "HHH -" << _damage
+        //          << ">>" << op->giveHealth();
         if (!op->isActive()) {
-            qDebug() << "\tKILLED" << qPrintable(op->giveName())
-                     << "#" << op->giveID();
+            printLog(QString("KILL %1%2 --> %3%4")
+                         .arg(giveName())
+                         .arg(_place->giveID())
+                         .arg(op->giveName())
+                         .arg(op_place->giveID()));
             op->hide();
         }
     } else {
@@ -50,7 +53,9 @@ void Reunion::action(size_t time, size_t& hp, Infected* op)
             direction.first = (_route.back()->x() - _place->x()) / 100 * _move_speed;
             direction.second = (_route.back()->y() - _place->y()) / 100 * _move_speed;
             if (_place->isBase()) {
-                qDebug() << "\tGETINTOBASE" << qPrintable(giveName()) << "#" << giveID();
+                printLog(QString("BASE %1 # %2")
+                             .arg(giveName())
+                             .arg(_place->giveID()));
                 _is_active = false;
                 if (--hp == 0) {
                     throw LoseException();
@@ -103,4 +108,9 @@ void TestReunion::paintEvent(QPaintEvent* event)
 void Reunion::mousePressEvent(QMouseEvent* event)
 {
     return _place->mousePressEvent(event);
+}
+
+void Reunion::mouseReleaseEvent(QMouseEvent* event)
+{
+    return _place->mouseReleaseEvent(event);
 }
