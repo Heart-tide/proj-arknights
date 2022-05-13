@@ -20,7 +20,7 @@ class Map : public QWidget {
 public:
     friend class GameState;
     friend void deployOperator(GameState* gamestate, Place* place, int orientation);
-    friend void printLog(const QString& str, Map* map_init);
+    friend void printLog(const QString& color, const QString& type, const QString& info, Map* map_init);
 
     Map(GameState* gamestate, QWidget* parent);
     void connectOperators();
@@ -49,6 +49,6 @@ private:
     int _operatorSelected;
 };
 
-void printLog(const QString& str, Map* map_init = nullptr);
+void printLog(const QString& color, const QString& type, const QString& info, Map* map_init = nullptr);
 
 #endif // MAP_H

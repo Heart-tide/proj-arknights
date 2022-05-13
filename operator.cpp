@@ -35,11 +35,7 @@ void Operator::action(size_t time, Infected* attacked)
         //          << "HHH -" << _damage
         //          << ">>" << attacked->giveHealth();
         if (!attacked->isActive()) {
-            printLog(QString("KILL %1%2 --> %3%4")
-                         .arg(giveName())
-                         .arg(_place->giveID())
-                         .arg(attacked->giveName())
-                         .arg(attacked_place->giveID()));
+            printLog("ee0000", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(attacked->giveName()).arg(attacked_place->giveID()));
             attacked->hide();
         }
         update();

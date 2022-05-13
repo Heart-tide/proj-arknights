@@ -36,11 +36,7 @@ void Reunion::action(size_t time, size_t& hp, Infected* op)
         //          << "HHH -" << _damage
         //          << ">>" << op->giveHealth();
         if (!op->isActive()) {
-            printLog(QString("KILL %1%2 --> %3%4")
-                         .arg(giveName())
-                         .arg(_place->giveID())
-                         .arg(op->giveName())
-                         .arg(op_place->giveID()));
+            printLog("ff9933", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(op->giveName()).arg(op_place->giveID()));
             op->hide();
         }
     } else {
@@ -53,9 +49,7 @@ void Reunion::action(size_t time, size_t& hp, Infected* op)
             direction.first = (_route.back()->x() - _place->x()) / 100 * _move_speed;
             direction.second = (_route.back()->y() - _place->y()) / 100 * _move_speed;
             if (_place->isBase()) {
-                printLog(QString("BASE %1 # %2")
-                             .arg(giveName())
-                             .arg(_place->giveID()));
+                printLog("ff9933", "BASE", QString("HP %2 -> %3").arg(hp).arg(hp - 1));
                 _is_active = false;
                 if (--hp == 0) {
                     throw LoseException();

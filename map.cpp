@@ -17,8 +17,8 @@ Map::Map(GameState* gamestate, QWidget* parent)
     connectOperators();
     loadMap();
     loadRoutes();
-    printLog(QString("地图生成成功, 大小 %1 * %2").arg(giveHeight()).arg(giveWidth()));
-    printLog("游戏开始了哦!");
+    printLog("000000", "", QString("地图生成成功, 大小 %1 * %2").arg(giveHeight()).arg(giveWidth()));
+    printLog("000000", "", "游戏开始了哦!");
 }
 
 Map::~Map()
@@ -30,11 +30,11 @@ void Map::connectOperators()
 {
     connect(ui->photo_irene, &QPushButton::clicked, this, [=]() {
         _operatorSelected = 0;
-        printLog(QString("CHOOSE Irene"));
+        printLog("cc00cc", "CHOOSE", "Irene");
     });
     connect(ui->photo_kroos, &QPushButton::clicked, this, [=]() {
         _operatorSelected = 1;
-        printLog(QString("CHOOSE Kroos"));
+        printLog("cc00cc", "CHOOSE", "Kroos");
     });
 }
 
@@ -45,7 +45,7 @@ void Map::loadMap()
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
-    printLog("地图文件读取成功!", this);
+    printLog("000000", "", "地图文件读取成功!", this);
     QTextStream in(&file);
     size_t height = 0;
     size_t width = 0;
@@ -79,7 +79,7 @@ void Map::loadMap()
             }
             line.push_back(place);
             place->setGeometry(j * 100, i * 100 + 5, 100, 100);
-            place->_id = QPair<size_t, size_t>(i, j);
+            place->_id = QPair<size_t, size_t>(j, i); //* 按 x,y 顺序赋予 id
         }
         _lines.push_back(line);
     }
@@ -116,14 +116,19 @@ void Map::loadRoutes()
     }
 }
 
-void printLog(const QString& str, Map* map_init)
+void printLog(const QString& color, const QString& type, const QString& info, Map* map_init)
 {
     static Map* map = nullptr;
     if (map_init != nullptr) {
         map = map_init;
     }
     if (map != nullptr) {
-        map->ui->text_log->appendPlainText(str);
+        map->ui->text_log->appendHtml(QString(R"(<html><head/><body><p>
+                    <span style=" font-weight:600;color:#%1;">
+                    %2 </span>%3</p></body></html>)")
+                                          .arg(color)
+                                          .arg(type)
+                                          .arg(info));
     }
 }
 

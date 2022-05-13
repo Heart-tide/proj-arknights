@@ -33,8 +33,10 @@ void GameState::connectWithWidgets()
     connect(ui->push_speed, &QPushButton::clicked, this, [=]() {
         if (_speed == 1) {
             ui->push_speed->setStyleSheet("image: url(:/res/photo/speed_2x.png);");
+            printLog("0000ff", "SPEED", "UP");
         } else {
             ui->push_speed->setStyleSheet("image: url(:/res/photo/speed_1x.png);");
+            printLog("0000ff", "SPEED", "DOWN");
         }
         _speed = 3 - _speed;
         _timer->setInterval(20 / _speed);
@@ -42,9 +44,11 @@ void GameState::connectWithWidgets()
     connect(ui->push_pause, &QPushButton::clicked, this, [=]() {
         if (_timer->isActive()) {
             ui->push_pause->setStyleSheet("image: url(:/res/photo/continue.png);");
+            printLog("0000ff", "TIME", "PAUSE");
             _timer->stop();
         } else if (!_timer->isActive() && !_gameover) {
             ui->push_pause->setStyleSheet("image: url(:/res/photo/stop.png);");
+            printLog("0000ff", "TIME", "CONTINUE");
             _timer->start();
         }
     });
@@ -63,13 +67,11 @@ void GameState::update()
         _timer->stop();
         _gameover = true;
         // //* C++ 11 的 Raw String Literals，有助于更方便地书写字符串字面量：R"(……)"，中间可加换行
-        _map->ui->text_log->appendHtml(R"(<html><head/><body><p><span style=" font-weight:600;
-            color:#66ccff;">YOU WIN</span></p></body></html>)");
+        printLog("3300ff", "YOU WIN", "");
     } catch (LoseException& e) {
         _timer->stop();
         _gameover = true;
-        _map->ui->text_log->appendHtml(R"(<html><head/><body><p><span style=" font-weight:600;
-            color:#66ccff;">YOU LOSE</span></p></body></html>)");
+        printLog("3300ff", "YOU LOSE", "");
     }
     _map->ui->label_enemy_stats->setText(QString::number(_enemy_stats + _active_reunions.size()));
     _map->ui->label_hp->setText(QString::number(_hp));
@@ -101,7 +103,7 @@ void GameState::deployOperator(size_t choice, Place* place, Orientation orientat
     // _map->_operatorSelected = -1; //* 永远不清空干员预置栏
     _dp -= op->giveCost();
     _active_operators.push_back(op);
-    printLog(QString("CREATE %1%3").arg(op->giveName()).arg(op->givePlace()->giveID()));
+    printLog("33cccc", "DEPLOY", QString("%1 %2").arg(op->giveName()).arg(op->givePlace()->giveID()));
 }
 
 //* 场上所有 active 的 operator 按其生成次序行动
