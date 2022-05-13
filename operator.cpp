@@ -8,14 +8,17 @@ Operator::Operator(size_t health,
     size_t id,
     QWidget* parent,
     size_t block,
-    Orientation orientation)
+    Orientation orientation,
+    QMovie* idle_movie,
+    QMovie* attack_movie)
     : Infected(health, damage, interval, place,
-        deployment_time, id, parent)
+        deployment_time, id, parent, idle_movie, attack_movie)
     , _block(block)
     , _orientation(orientation)
 {
     //? 要show才能调用绘图事件！！！
     show();
+    _place->addOperator(this);
 }
 
 void Operator::action(size_t time, Infected* attacked)
@@ -24,21 +27,18 @@ void Operator::action(size_t time, Infected* attacked)
         return;
     }
     if (attacked) { //* 暂时无视阻挡数要求
+        _is_attacking = true;
         _last_action_time = time;
         auto attacked_place = attacked->givePlace();
         //* 类的函数不一定都是成员函数，定义在类外有时不失为一种选择
         attacked->reduceHealth(_damage);
-        // qDebug() << "\tATTACK" << qPrintable(giveName())
-        //          << "#" << giveID()
-        //          << "***" << qPrintable(attacked->giveName())
-        //          << "#" << attacked->giveID()
-        //          << "HHH -" << _damage
-        //          << ">>" << attacked->giveHealth();
         if (!attacked->isActive()) {
+            // C++ 11 的 Raw String Literals，有助于更方便地书写字符串字面量：R"(……)"，中间可加换行
             printLog("ee0000", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(attacked->giveName()).arg(attacked_place->giveID()));
             attacked->hide();
         }
-        update();
+    } else {
+        _is_attacking = false;
     }
 }
 
@@ -59,6 +59,16 @@ void Operator::removeFrom()
 void Operator::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
+    //* 画干员
+    if (_is_attacking) {
+        _attack_movie->start();
+        _idle_movie->stop();
+        painter.drawPixmap(-50, -70, 200, 200, _attack_movie->currentPixmap());
+    } else {
+        _idle_movie->start();
+        _attack_movie->stop();
+        painter.drawPixmap(-50, -70, 200, 200, _idle_movie->currentPixmap());
+    }
     //* 画血条
     QBrush red_brush(QColor("#EE0000"));
     painter.setBrush(red_brush);
@@ -91,8 +101,11 @@ Sniper::Sniper(size_t health,
     size_t deployment_time,
     size_t id,
     QWidget* parent,
-    Orientation orientation)
-    : Operator(health, damage, interval, higher_place, deployment_time, id, parent, 0, orientation)
+    Orientation orientation,
+    QMovie* idle_movie,
+    QMovie* attack_movie)
+    : Operator(health, damage, interval, higher_place, deployment_time,
+        id, parent, 0, orientation, idle_movie, attack_movie)
 {
     setGeometry(_place->x() - 5, _place->y() - 8, 100, 100);
 }
@@ -105,8 +118,11 @@ Guard::Guard(size_t health,
     size_t id,
     QWidget* parent,
     size_t block,
-    Orientation orientation)
-    : Operator(health, damage, interval, lower_place, deployment_time, id, parent, block, orientation)
+    Orientation orientation,
+    QMovie* idle_movie,
+    QMovie* attack_movie)
+    : Operator(health, damage, interval, lower_place, deployment_time,
+        id, parent, block, orientation, idle_movie, attack_movie)
 {
     setGeometry(_place->x() - 15, _place->y(), 100, 100);
 }
@@ -116,17 +132,10 @@ Irene::Irene(LowerPlace* lower_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Guard(100, 10, 30, lower_place, deployment_time, id, parent, 3, orientation)
+    : Guard(100, 10, 30, lower_place, deployment_time, id, parent, 3, orientation,
+        new QMovie("://res/operator/Irene-idle.gif"),
+        new QMovie("://res/operator/Irene-attack.gif"))
 {
-    _place->addOperator(this);
-}
-
-void Irene::paintEvent(QPaintEvent* event)
-{
-    QPainter painter(this);
-    QPixmap Irene("://res/operator/Irene.png");
-    painter.drawPixmap(0, 0, 100, 100, Irene);
-    Operator::paintEvent(event);
 }
 
 Kroos::Kroos(HigherPlace* higher_place,
@@ -134,14 +143,8 @@ Kroos::Kroos(HigherPlace* higher_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Sniper(20, 4, 20, higher_place, deployment_time, id, parent, orientation)
+    : Sniper(20, 4, 20, higher_place, deployment_time, id, parent, orientation,
+        new QMovie("://res/operator/Kroos-idle.gif"),
+        new QMovie("://res/operator/Kroos-attack.gif"))
 {
-}
-
-void Kroos::paintEvent(QPaintEvent* event)
-{
-    QPainter painter(this);
-    QPixmap Kroos("://res/operator/Kroos.png");
-    painter.drawPixmap(0, 0, 100, 100, Kroos);
-    Operator::paintEvent(event);
 }

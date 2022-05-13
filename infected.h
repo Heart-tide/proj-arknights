@@ -3,8 +3,10 @@
 
 #include "map.h"
 #include <QException>
+#include <QMovie>
 #include <QPainter>
 #include <QString>
+#include <QTimer>
 #include <QWidget>
 
 class GameState;
@@ -14,10 +16,11 @@ class Infected : public QWidget {
 
 public:
     Infected(size_t health, int damage, size_t interval,
-        Place* place, size_t deployment_time, size_t id, QWidget* parent);
-    virtual ~Infected() = default;
+        Place* place, size_t deployment_time, size_t id, QWidget* parent,
+        QMovie* idle_movie, QMovie* attack_movie);
 
     void reduceHealth(int damage);
+    void stopAttacking() { _is_attacking = false; }
 
     virtual void addTo(Place* place) = 0;
     virtual void removeFrom() = 0;
@@ -31,6 +34,7 @@ public:
     bool isActive() { return _is_active; }
 
     void paintEvent(QPaintEvent*) = 0;
+    void timerEvent(QTimerEvent*) override;
 
 protected:
     int _health;
@@ -44,6 +48,10 @@ protected:
     bool _is_active;
 
     size_t _id;
+
+    QMovie* _idle_movie;
+    QMovie* _attack_movie;
+    bool _is_attacking;
 };
 
 Infected* giveRandomInfected(QVector<Infected*>& infecteds);
@@ -51,20 +59,17 @@ Infected* giveRandomInfected(QVector<Infected*>& infecteds);
 //**************** 胜利和失败条件 ****************
 class GameOverException : public QException {
 public:
-    void raise() const override { throw *this; }
-    GameOverException* clone() const override { return new GameOverException(*this); }
+    virtual QString what() noexcept = 0;
 };
 
-class WinException : public GameOverException {
+class WinGameException : public GameOverException {
 public:
-    void raise() const override { throw *this; }
-    WinException* clone() const override { return new WinException(*this); }
+    QString what() noexcept override { return "You Win"; }
 };
 
-class LoseException : public GameOverException {
+class LoseGameException : public GameOverException {
 public:
-    void raise() const override { throw *this; }
-    LoseException* clone() const override { return new LoseException(*this); }
+    QString what() noexcept override { return "You Lose"; }
 };
 
 #endif // INFECTED_H

@@ -53,8 +53,8 @@ HigherPlace::HigherPlace(GameState* gamestate, QWidget* parent)
 
 QString Place::giveID() const
 {
-    return "[" + QString::number(_id.first)
-        + "," + QString::number(_id.second) + "]";
+    return "[" + QString::number(_id.second)
+        + "," + QString::number(_id.first) + "]";
 }
 
 void Place::mousePressEvent(QMouseEvent* event)

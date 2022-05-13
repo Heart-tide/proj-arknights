@@ -16,7 +16,8 @@ class Operator : public Infected {
 public:
     Operator(size_t health, int damage, size_t interval,
         Place* place, size_t deployment_time, size_t id,
-        QWidget* parent, size_t block, Orientation orientation);
+        QWidget* parent, size_t block, Orientation orientation,
+        QMovie* idle_movie, QMovie* attack_movie);
 
     void action(size_t time, Infected* attacked);
 
@@ -43,7 +44,8 @@ class Sniper : public Operator {
 public:
     Sniper(size_t health, int damage, size_t interval,
         HigherPlace* higher_place, size_t deployment_time,
-        size_t id, QWidget* parent, Orientation orientation);
+        size_t id, QWidget* parent, Orientation orientation,
+        QMovie* idle_movie, QMovie* attack_movie);
 
     QPair<int, int> giveAttackArea() const override { return QPair<int, int>(3, 3); }
 };
@@ -57,7 +59,6 @@ public:
 
     size_t giveCost() override { return cost; }
     QString giveName() const override { return "Kroos"; }
-    void paintEvent(QPaintEvent*) override;
 
     //* 将 cost 设计成静态成员，以便在不创建对象的前提下，直接用类名进行引用
     static constexpr size_t cost = 5;
@@ -70,7 +71,8 @@ class Guard : public Operator {
 public:
     Guard(size_t health, int damage, size_t interval,
         LowerPlace* lower_place, size_t deployment_time,
-        size_t id, QWidget* parent, size_t block, Orientation orientation);
+        size_t id, QWidget* parent, size_t block, Orientation orientation,
+        QMovie* idle_movie, QMovie* attack_movie);
 
     QPair<int, int> giveAttackArea() const override { return QPair<int, int>(1, 2); }
 };
@@ -84,7 +86,6 @@ public:
 
     size_t giveCost() override { return cost; }
     QString giveName() const override { return "Irene"; }
-    void paintEvent(QPaintEvent*) override;
 
     static constexpr size_t cost = 3;
 };

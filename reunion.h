@@ -13,7 +13,8 @@ class Reunion : public Infected {
 public:
     Reunion(size_t health, int damage, size_t interval,
         Place* place, size_t deployment_time, size_t move_speed,
-        size_t id, QVector<Place*> route, QWidget* parent);
+        size_t id, QVector<Place*> route, QWidget* parent,
+        QMovie* idle_movie, QMovie* attack_movie);
     ~Reunion() = default;
 
     void action(size_t time, size_t& hp, Infected* op);
@@ -34,15 +35,14 @@ protected:
     QPair<int, int> direction;
 };
 
-class TestReunion : public Reunion {
+class Yuan : public Reunion {
     Q_OBJECT
 
 public:
-    TestReunion(Place* place, size_t deployment_time,
+    Yuan(Place* place, size_t deployment_time,
         size_t id, QVector<Place*> route, QWidget* parent);
 
-    QString giveName() const override { return "TestReunion"; }
-    void paintEvent(QPaintEvent*) override;
+    QString giveName() const override { return "Yuan"; }
 };
 
 #endif // REUNION_H

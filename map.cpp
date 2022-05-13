@@ -79,7 +79,7 @@ void Map::loadMap()
             }
             line.push_back(place);
             place->setGeometry(j * 100, i * 100 + 5, 100, 100);
-            place->_id = QPair<size_t, size_t>(j, i); //* 按 x,y 顺序赋予 id
+            place->_id = QPair<size_t, size_t>(i, j);
         }
         _lines.push_back(line);
     }
@@ -118,18 +118,14 @@ void Map::loadRoutes()
 
 void printLog(const QString& color, const QString& type, const QString& info, Map* map_init)
 {
-    static Map* map = nullptr;
-    if (map_init != nullptr) {
-        map = map_init;
-    }
-    if (map != nullptr) {
-        map->ui->text_log->appendHtml(QString(R"(<html><head/><body><p>
-                    <span style=" font-weight:600;color:#%1;">
-                    %2 </span>%3</p></body></html>)")
-                                          .arg(color)
-                                          .arg(type)
-                                          .arg(info));
-    }
+    //* 仅在第一次调用时传参 map_init，形成闭包
+    static Map* map = map_init;
+    map->ui->text_log->appendHtml(QString(R"(<html><head/><body><p>
+                <span style=" font-weight:600;color:#%1;">
+                %2 </span>%3</p></body></html>)")
+                                      .arg(color)
+                                      .arg(type)
+                                      .arg(info));
 }
 
 void Map::paintEvent(QPaintEvent*)

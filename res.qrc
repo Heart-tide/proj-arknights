@@ -1,12 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>res/place/jia.jpg</file>
-        <file>res/reunion/yuan.png</file>
-        <file>res/operator/Irene.png</file>
         <file>res/place/higher.png</file>
         <file>res/place/lower.png</file>
-        <file>res/operator/Kroos.png</file>
-        <file>res/photo/Irene.png</file>
         <file>res/photo/Kroos.png</file>
         <file>res/photo/enemy_stats.png</file>
         <file>res/photo/hp.png</file>
@@ -15,5 +11,12 @@
         <file>res/photo/speed_1x.png</file>
         <file>res/photo/speed_2x.png</file>
         <file>res/photo/stop.png</file>
+        <file>res/operator/Irene-attack.gif</file>
+        <file>res/operator/Irene-idle.gif</file>
+        <file>res/photo/Irene.png</file>
+        <file>res/operator/Kroos-attack.gif</file>
+        <file>res/operator/Kroos-idle.gif</file>
+        <file>res/reunion/yuan-attack.gif</file>
+        <file>res/reunion/yuan-idle.gif</file>
     </qresource>
 </RCC>

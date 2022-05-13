@@ -46,6 +46,13 @@ void GameState::connectWithWidgets()
             ui->push_pause->setStyleSheet("image: url(:/res/photo/continue.png);");
             printLog("0000ff", "TIME", "PAUSE");
             _timer->stop();
+            //* 停止所有对象的攻击动作
+            for (auto it = _active_operators.begin(); it < _active_operators.end(); it++) {
+                (*it)->stopAttacking();
+            }
+            for (auto it = _active_reunions.begin(); it < _active_reunions.end(); it++) {
+                (*it)->stopAttacking();
+            }
         } else if (!_timer->isActive() && !_gameover) {
             ui->push_pause->setStyleSheet("image: url(:/res/photo/stop.png);");
             printLog("0000ff", "TIME", "CONTINUE");
@@ -63,15 +70,11 @@ void GameState::update()
         reunionStragegy();
         reunionAction();
         operatorAction();
-    } catch (WinException& e) {
-        _timer->stop();
+    } catch (GameOverException& exception) {
+        //* 检测游戏结束
+        emit _map->ui->push_pause->clicked(); //* 暂停计时器
         _gameover = true;
-        // //* C++ 11 的 Raw String Literals，有助于更方便地书写字符串字面量：R"(……)"，中间可加换行
-        printLog("3300ff", "YOU WIN", "");
-    } catch (LoseException& e) {
-        _timer->stop();
-        _gameover = true;
-        printLog("3300ff", "YOU LOSE", "");
+        printLog("3300ff", exception.what(), "");
     }
     _map->ui->label_enemy_stats->setText(QString::number(_enemy_stats + _active_reunions.size()));
     _map->ui->label_hp->setText(QString::number(_hp));
@@ -114,6 +117,8 @@ void GameState::operatorAction()
         if ((*it)->isActive()) {
             (*it)->action(_time, properAttackedReunion(*it));
             still_active.push_back(*it);
+        } else {
+            delete (*it);
         }
     }
     _active_operators = still_active;
@@ -188,10 +193,12 @@ void GameState::reunionAction()
         if ((*it)->isActive()) {
             (*it)->action(_time, _hp, (*it)->givePlace()->giveOperator());
             still_active.push_back(*it);
+        } else {
+            delete (*it);
         }
     }
     if (still_active.empty() && _enemy_stats == 0) {
-        throw WinException();
+        throw WinGameException();
     }
     _active_reunions = still_active;
 }
@@ -203,7 +210,7 @@ Reunion* GameState::createRandomReunion()
     srand(static_cast<unsigned>(clock()));
     switch (rand() % 1) {
     case 0:
-        return new TestReunion(_map->_entrance, _time, id_counter++,
+        return new Yuan(_map->_entrance, _time, id_counter++,
             _map->giveRandomRoute(), this);
     default:
         return nullptr;
@@ -213,6 +220,9 @@ Reunion* GameState::createRandomReunion()
 //* 当点击一个格子时调用，若符合条件，则放置一个干员
 void deployOperator(GameState* gamestate, Place* place, int orientation)
 {
+    if (gamestate->_gameover) {
+        return;
+    }
     int choice = gamestate->_map->_operatorSelected;
     switch (choice) {
     case -1:
