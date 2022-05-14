@@ -32,7 +32,7 @@ public:
     virtual bool isEntrance() { return false; }
     virtual bool isLower() { return false; }
     virtual bool isHigher() { return false; }
-    virtual bool isReachable() { return false; }
+    virtual bool isReachable() { return false; } //* 指整合运动地面部队能否到达该地块
 
     Infected* giveOperator() { return _op; }
     QVector<Infected*>& giveReunions() { return _reunions; }
@@ -52,14 +52,14 @@ protected:
 
 //************* Place 有三个子类：不可到达的地块、低地、高地 *************
 
-//* 这里是不可到达地块
+//* 这里是特殊地块
 
 //* 不可到达，编号 4
-class UnreachablePlace : public Place {
+class SpecialPlace : public Place {
     Q_OBJECT
 
 public:
-    UnreachablePlace(GameState* gamestate, QWidget* parent);
+    SpecialPlace(GameState* gamestate, QWidget* parent);
 
     void addOperator(Infected*) override { }
     void addReunion(Infected*) override { }
@@ -67,21 +67,23 @@ public:
     void removeReunion(Infected*) override { }
 };
 //* 我方基地，编号 0
-class Base : public UnreachablePlace {
+class Base : public SpecialPlace {
     Q_OBJECT
 
 public:
     Base(GameState* gamestate, QWidget* parent);
     bool isBase() override { return true; }
+    bool isReachable() override { return true; }
 };
 
 //* 敌方入口，编号 1
-class Entrance : public UnreachablePlace {
+class Entrance : public SpecialPlace {
     Q_OBJECT
 
 public:
     Entrance(GameState* gamestate, QWidget* parent);
     bool isEntrance() override { return true; }
+    bool isReachable() override { return true; }
 };
 
 //* 这里是低地和高地

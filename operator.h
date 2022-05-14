@@ -27,6 +27,7 @@ public:
     virtual size_t giveCost() = 0;
     QString giveName() const override { return "Operator"; }
     Orientation giveOrientation() const { return _orientation; }
+    virtual bool isGroundToAir() { return false; }
     //* 假设向右部署，干员的矩形攻击范围的 height, width 大小
     virtual QPair<int, int> giveAttackArea() const { return QPair<int, int>(1, 1); }
 
@@ -47,6 +48,8 @@ public:
         size_t id, QWidget* parent, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
 
+    QString giveName() const override { return "Sniper"; }
+    bool isGroundToAir() override { return true; }
     QPair<int, int> giveAttackArea() const override { return QPair<int, int>(3, 3); }
 };
 
@@ -74,6 +77,7 @@ public:
         size_t id, QWidget* parent, size_t block, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
 
+    QString giveName() const override { return "Guard"; }
     QPair<int, int> giveAttackArea() const override { return QPair<int, int>(1, 2); }
 };
 

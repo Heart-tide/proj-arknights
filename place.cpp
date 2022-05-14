@@ -32,12 +32,12 @@ void Place::removeReunion(Infected* reunion)
 }
 
 Base::Base(GameState* gamestate, QWidget* parent)
-    : UnreachablePlace(gamestate, parent)
+    : SpecialPlace(gamestate, parent)
 {
 }
 
 Entrance::Entrance(GameState* gamestate, QWidget* parent)
-    : UnreachablePlace(gamestate, parent)
+    : SpecialPlace(gamestate, parent)
 {
 }
 
@@ -89,7 +89,7 @@ void Place::mouseReleaseEvent(QMouseEvent* event)
     }
 }
 
-UnreachablePlace::UnreachablePlace(GameState* gamestate, QWidget* parent)
+SpecialPlace::SpecialPlace(GameState* gamestate, QWidget* parent)
     : Place(gamestate, parent)
 {
 }

@@ -31,13 +31,13 @@ public:
 
     size_t giveHeight() const { return _lines.size(); }
     size_t giveWidth() const { return _lines.empty() ? 0 : _lines[0].size(); }
-    QVector<Place*> giveRandomRoute() const;
+    QVector<Place*> giveRandomRoute(bool is_air_route) const;
 
     void paintEvent(QPaintEvent*) override;
 
 private:
     void loadMap();
-    void loadRoutes(); //* 只按坐标保存路径，载入时换算成Place*链表
+    void loadRoutes(bool is_air_routes);
 
     Ui::Map* ui;
 
@@ -45,7 +45,8 @@ private:
     QVector<QVector<Place*>> _lines;
     Base* _base;
     Entrance* _entrance;
-    QVector<QVector<Place*>> _routes;
+    //* 0 号位存储地面路径，1 号位存储空中路径，与 bool is_air_route 配合使用
+    QVector<QVector<Place*>> _routes[2];
     int _operatorSelected;
 };
 

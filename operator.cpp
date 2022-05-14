@@ -132,7 +132,7 @@ Irene::Irene(LowerPlace* lower_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Guard(100, 10, 30, lower_place, deployment_time, id, parent, 3, orientation,
+    : Guard(70, 10, 30, lower_place, deployment_time, id, parent, 3, orientation,
         new QMovie("://res/operator/Irene-idle.gif"),
         new QMovie("://res/operator/Irene-attack.gif"))
 {
@@ -143,7 +143,7 @@ Kroos::Kroos(HigherPlace* higher_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Sniper(20, 4, 20, higher_place, deployment_time, id, parent, orientation,
+    : Sniper(40, 7, 20, higher_place, deployment_time, id, parent, orientation,
         new QMovie("://res/operator/Kroos-idle.gif"),
         new QMovie("://res/operator/Kroos-attack.gif"))
 {

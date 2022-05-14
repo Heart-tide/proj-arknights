@@ -76,7 +76,7 @@ void GameState::update()
         _gameover = true;
         printLog("3300ff", exception.what(), "");
     }
-    _map->ui->label_enemy_stats->setText(QString::number(_enemy_stats + _active_reunions.size()));
+    _map->ui->label_enemy_stats->setText(QString::number(_enemy_stats)); //* 仅显示未出现的敌人数
     _map->ui->label_hp->setText(QString::number(_hp));
     _map->ui->label_dp->setText(QString::number(_dp));
 }
@@ -156,16 +156,14 @@ Infected* GameState::properAttackedReunion(Operator* op) const
     }
     //* 先列后行进行遍历
     //? 从 先行后列 到 先x后y 的转换，需要多加注意！以后都应写成 先x后y，更通用。
-    for (int i = x; i < x + width; i++) {
-        if (i < 0 || i >= _map->giveWidth()) {
-            continue;
-        }
-        for (int j = y; j < y + height; j++) {
-            if (j < 0 || j >= _map->giveHeight()) {
-                continue;
-            }
-            if (!(*_map)[j][i]->giveReunions().empty()) {
-                return (*_map)[j][i]->giveReunions()[0];
+    bool is_ground_to_air = op->isGroundToAir();
+    for (int i = max(x, 0); i < min<int>(x + width, _map->giveWidth()); i++) {
+        for (int j = max(y, 0); j < min<int>(y + height, _map->giveHeight()); j++) {
+            for (auto it = (*_map)[j][i]->giveReunions().begin(); it < (*_map)[j][i]->giveReunions().end(); it++) {
+                //* 要不我方干员是可对空的，要不敌方是地面单位
+                if (is_ground_to_air || (dynamic_cast<Reunion*>(*it)->isFlying() == false)) {
+                    return (*it);
+                }
             }
         }
     }
@@ -184,37 +182,58 @@ void GameState::reunionStragegy()
     // printLog(QString("CREATE %1 # %2").arg(reunion->giveName()).arg(reunion->giveID()));
 }
 
-//* 场上所有 active 的 Reunion 按其生成次序行动
-void GameState::reunionAction()
-{
-    QVector<Reunion*> still_active;
-    for (auto it = _active_reunions.begin(); it < _active_reunions.end(); it++) {
-        //! TODO 暂时敌军只能攻击与自己同格子的单位
-        if ((*it)->isActive()) {
-            (*it)->action(_time, _hp, (*it)->givePlace()->giveOperator());
-            still_active.push_back(*it);
-        } else {
-            delete (*it);
-        }
-    }
-    if (still_active.empty() && _enemy_stats == 0) {
-        throw WinGameException();
-    }
-    _active_reunions = still_active;
-}
-
 //* 随机生成一个 Reunion 的对象，可以给不同类型以不同的生成概率
 Reunion* GameState::createRandomReunion()
 {
     static size_t id_counter = 0;
     srand(static_cast<unsigned>(clock()));
-    switch (rand() % 1) {
+    switch (rand() % 3) {
     case 0:
+    case 1:
         return new Yuan(_map->_entrance, _time, id_counter++,
-            _map->giveRandomRoute(), this);
+            _map->giveRandomRoute(false), this);
+    case 2:
+        return new Monster(_map->_entrance, _time, id_counter++,
+            _map->giveRandomRoute(true), this);
     default:
         return nullptr;
     }
+}
+
+//* 场上所有 active 的 Reunion 按其生成次序行动
+void GameState::reunionAction()
+{
+    QVector<Reunion*> still_active;
+    for (auto it = _active_reunions.begin(); it < _active_reunions.end(); it++) {
+        if ((*it)->isActive()) {
+            (*it)->action(_time, _hp, properAttackedOperator(*it));
+            still_active.push_back(*it);
+        } else {
+            delete (*it);
+        }
+    }
+    _active_reunions = still_active;
+    if (still_active.empty() && _enemy_stats == 0) {
+        throw WinGameException();
+    }
+}
+
+//* 计算整合运动可攻击到的干员
+Infected* GameState::properAttackedOperator(Reunion* reunion) const
+{
+    bool is_flying = reunion->isFlying();
+    int x = reunion->givePlace()->showID().second - reunion->giveAttackArea();
+    int y = reunion->givePlace()->showID().first - reunion->giveAttackArea();
+    int a = 2 * reunion->giveAttackArea() + 1;
+    for (int i = max(x, 0); i < min<int>(x + a, _map->giveWidth()); i++) {
+        for (int j = max(y, 0); j < min<int>(y + a, _map->giveHeight()); j++) {
+            //* 要不整合运动是飞行单位，要不我方干员是地面单位
+            if ((*_map)[j][i]->giveOperator() && (is_flying || (*_map)[j][i]->isLower())) {
+                return (*_map)[j][i]->giveOperator();
+            }
+        }
+    }
+    return nullptr;
 }
 
 //* 当点击一个格子时调用，若符合条件，则放置一个干员

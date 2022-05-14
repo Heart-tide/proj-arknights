@@ -25,8 +25,9 @@ public:
     Infected* properAttackedReunion(Operator* op) const;
 
     void reunionStragegy();
-    void reunionAction();
     Reunion* createRandomReunion();
+    void reunionAction();
+    Infected* properAttackedOperator(Reunion* reunion) const;
 
 private:
     Map* _map;
@@ -47,5 +48,18 @@ private:
 };
 
 void deployOperator(GameState* gamestate, Place* place, int orientation);
+
+//* 写个模板，有助于简单比较
+template <class T>
+inline T max(T x, T y)
+{
+    return (x > y) ? x : y;
+}
+
+template <class T>
+inline T min(T x, T y)
+{
+    return (x < y) ? x : y;
+}
 
 #endif // GAMESTATE_H

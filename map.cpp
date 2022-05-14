@@ -9,14 +9,15 @@
 
 Map::Map(GameState* gamestate, QWidget* parent)
     : QWidget(parent)
-    , _gamestate(gamestate)
     , ui(new Ui::Map)
+    , _gamestate(gamestate)
     , _operatorSelected(-1)
 {
     ui->setupUi(this);
     connectOperators();
     loadMap();
-    loadRoutes();
+    loadRoutes(false); //* 生成地面路径
+    loadRoutes(true); //* 生成空中路径
     printLog("000000", "", QString("地图生成成功, 大小 %1 * %2").arg(giveHeight()).arg(giveWidth()));
     printLog("000000", "", "游戏开始了哦!");
 }
@@ -38,14 +39,19 @@ void Map::connectOperators()
     });
 }
 
+//* 读取在 map 文件夹下的所有地图文件
 void Map::loadMap()
 {
-    //* currentPath 指出 exe 文件所在目录
-    QFile file(QDir::currentPath() + "/map.txt");
+    //* currentPath 指出 exe 文件所在目录，QStringList("map-*.txt")过滤出所有地图文件
+    QList<QFileInfo> fileInfo(QDir(QDir::currentPath()).entryInfoList(QStringList("map-*.txt")));
+    //* 从已有地图中，随机选取一张地图执行
+    srand(static_cast<unsigned>(clock()));
+    size_t map_choice = rand() % (fileInfo.size() - 2); //* 去掉上级目录和当前目录两项，其余的即地图数目
+    QFile file(QDir::currentPath() + QString("/map/map-%1.txt").arg(map_choice));
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
-    printLog("000000", "", "地图文件读取成功!", this);
+    printLog("000000", "", QString("地图文件 %1 读取成功!").arg(map_choice), this);
     QTextStream in(&file);
     size_t height = 0;
     size_t width = 0;
@@ -74,7 +80,7 @@ void Map::loadMap()
                 place = new HigherPlace(_gamestate, this);
                 break;
             case 4:
-                place = new UnreachablePlace(_gamestate, this);
+                place = new SpecialPlace(_gamestate, this);
                 break;
             }
             line.push_back(place);
@@ -85,24 +91,29 @@ void Map::loadMap()
     }
 }
 
-void Map::loadRoutes()
+void Map::loadRoutes(bool is_air_routes)
 {
-    //* 右上 --> 左下
+    //* 右上 --> 左下，随机生成 10 条路径
     //* 存储时由终点向起点
-    //* 随机生成 10 条路径
-    size_t width = giveWidth();
-    size_t height = giveHeight();
+
+    //* 试一下 lambda 表达式作为过程抽象的使用，它们自动内联
+    //* 编写具有通用性的程序真是爽快极了！
+    auto properPlaceToReach = [=](Place* place) -> bool {
+        return is_air_routes || place->isReachable();
+    };
+    int width = giveWidth();
+    int height = giveHeight();
     srand(static_cast<unsigned>(clock()));
-    for (size_t p = 0; p < 10; p++) {
+    for (int p = 0; p < 10; p++) {
         QVector<Place*> route;
-        size_t i = height - 1, j = 0;
+        int i = height - 1, j = 0;
         route.push_back((*this)[i][j]);
         for (int q = 0; q < height + width - 1; q++) {
-            if (i == 0 || !(*this)[i - 1][j]->isReachable()) {
+            if (i == 0 || !properPlaceToReach((*this)[i - 1][j])) {
                 route.push_back((*this)[i][j++]);
                 continue;
             }
-            if (j == width - 1 || !(*this)[i][j + 1]->isReachable()) {
+            if (j == width - 1 || !properPlaceToReach((*this)[i][j + 1])) {
                 route.push_back((*this)[i--][j]);
                 continue;
             }
@@ -112,7 +123,7 @@ void Map::loadRoutes()
                 route.push_back((*this)[i][j++]);
             }
         }
-        _routes.push_back(route);
+        _routes[is_air_routes].push_back(route);
     }
 }
 
@@ -128,42 +139,40 @@ void printLog(const QString& color, const QString& type, const QString& info, Ma
                                       .arg(info));
 }
 
+//* 画出地图上的所有格子
 void Map::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
     //? 修改完资源文件后勿忘及时在 Qt 中保存
-    QPixmap common_place("://res/place/jia.jpg");
-    QPixmap higher_place("://res/place/higher.png");
-    QPixmap lower_place("://res/place/lower.png");
-    auto drawSpecialPlace = [&](Place* place) {
-        painter.drawPixmap(place->x(), place->y(), place->height(), place->width(), lower_place);
-        painter.drawRect(place->x() + 2, place->y() + 2, place->width() - 4, place->height() - 4);
-        painter.drawLine(place->x() + 2, place->y() + 2, place->x() + place->width() - 2, place->y() + place->height() - 2);
-        painter.drawLine(place->x() + place->width() - 2, place->y() + 2, place->x() + 2, place->y() + place->height() - 2);
-    };
+    QPixmap common_place("://res/place/common.png");
+    QPixmap unreachable_place("://res/place/unreachable-1.png");
+    QPixmap higher_place("://res/place/higher-1.png");
+    QPixmap lower_place("://res/place/lower-1.png");
+    QPixmap base("://res/place/base.png");
+    QPixmap entrance("://res/place/entrance.png");
     for (size_t i = 0; i < giveHeight(); i++) {
         for (size_t j = 0; j < giveWidth(); j++) {
             Place* place = (*this)[i][j];
             if (place->isBase()) {
-                painter.setPen(QPen(Qt::blue, 5, Qt::SolidLine, Qt::RoundCap));
-                drawSpecialPlace(place);
+                painter.drawPixmap(place->x(), place->y(), place->height(), place->width(), common_place);
+                painter.drawPixmap(place->x() - 5, place->y() - 5, place->height() + 10, place->width() + 10, base);
             } else if (place->isEntrance()) {
-                painter.setPen(QPen(Qt::red, 5, Qt::SolidLine, Qt::RoundCap));
-                drawSpecialPlace(place);
+                painter.drawPixmap(place->x(), place->y(), place->height(), place->width(), common_place);
+                painter.drawPixmap(place->x() - 5, place->y() - 5, place->height() + 10, place->width() + 10, entrance);
             } else if (place->isLower()) {
                 painter.drawPixmap(place->x(), place->y(), place->height(), place->width(), lower_place);
             } else if (place->isHigher()) {
                 painter.drawPixmap(place->x(), place->y(), place->height(), place->width(), higher_place);
             } else {
-                painter.drawPixmap(place->x(), place->y(), place->height(), place->width(), common_place);
+                painter.drawPixmap(place->x(), place->y(), place->height(), place->width(), unreachable_place);
             }
         }
     }
 }
 
-QVector<Place*> Map::giveRandomRoute() const
+QVector<Place*> Map::giveRandomRoute(bool is_air_route) const
 {
     srand(static_cast<unsigned>(clock()));
-    auto i = rand() % _routes.size();
-    return _routes[i];
+    auto i = rand() % _routes[is_air_route].size();
+    return _routes[is_air_route][i];
 }

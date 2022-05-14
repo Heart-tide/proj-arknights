@@ -58,6 +58,7 @@ Infected* giveRandomInfected(QVector<Infected*>& infecteds);
 
 //**************** 胜利和失败条件 ****************
 class GameOverException : public QException {
+    //* QException 不能书写 QObject 标识
 public:
     virtual QString what() noexcept = 0;
 };
