@@ -34,7 +34,7 @@ void Operator::action(size_t time, Infected* attacked)
         attacked->reduceHealth(_damage);
         if (!attacked->isActive()) {
             // C++ 11 的 Raw String Literals，有助于更方便地书写字符串字面量：R"(……)"，中间可加换行
-            printLog("ee0000", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(attacked->giveName()).arg(attacked_place->giveID()));
+            printLog("#ee0000", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(attacked->giveName()).arg(attacked_place->giveID()));
             attacked->hide();
         }
     } else {

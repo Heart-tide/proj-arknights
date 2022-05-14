@@ -18,8 +18,8 @@ Map::Map(GameState* gamestate, QWidget* parent)
     loadMap();
     loadRoutes(false); //* 生成地面路径
     loadRoutes(true); //* 生成空中路径
-    printLog("000000", "", QString("地图生成成功, 大小 %1 * %2").arg(giveHeight()).arg(giveWidth()));
-    printLog("000000", "", "游戏开始了哦!");
+    printLog("#000000", "", QString("地图生成成功, 大小 %1 * %2").arg(giveHeight()).arg(giveWidth()));
+    printLog("#000000", "", "游戏开始了哦!");
 }
 
 Map::~Map()
@@ -31,11 +31,11 @@ void Map::connectOperators()
 {
     connect(ui->photo_irene, &QPushButton::clicked, this, [=]() {
         _operatorSelected = 0;
-        printLog("cc00cc", "CHOOSE", "Irene");
+        printLog("#cc00cc", "CHOOSE", "Irene");
     });
     connect(ui->photo_kroos, &QPushButton::clicked, this, [=]() {
         _operatorSelected = 1;
-        printLog("cc00cc", "CHOOSE", "Kroos");
+        printLog("#cc00cc", "CHOOSE", "Kroos");
     });
 }
 
@@ -43,15 +43,16 @@ void Map::connectOperators()
 void Map::loadMap()
 {
     //* currentPath 指出 exe 文件所在目录，QStringList("map-*.txt")过滤出所有地图文件
-    QList<QFileInfo> fileInfo(QDir(QDir::currentPath()).entryInfoList(QStringList("map-*.txt")));
+    QDir map_dir(QDir::currentPath() + "/../res/map");
+    QList<QFileInfo> fileInfo(map_dir.entryInfoList(QStringList("map-*.txt")));
     //* 从已有地图中，随机选取一张地图执行
-    srand(static_cast<unsigned>(clock()));
-    size_t map_choice = rand() % (fileInfo.size() - 2); //* 去掉上级目录和当前目录两项，其余的即地图数目
-    QFile file(QDir::currentPath() + QString("/map/map-%1.txt").arg(map_choice));
+    srand(static_cast<unsigned>(time(nullptr)));
+    size_t map_choice = rand() % fileInfo.size(); //* 去掉上级目录和当前目录两项，其余的即地图数目
+    QFile file(map_dir.absolutePath() + QString("/map-%1.txt").arg(map_choice));
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
-    printLog("000000", "", QString("地图文件 %1 读取成功!").arg(map_choice), this);
+    printLog("#000000", "", QString("地图文件 %1 读取成功!").arg(map_choice), this);
     QTextStream in(&file);
     size_t height = 0;
     size_t width = 0;
@@ -132,7 +133,7 @@ void printLog(const QString& color, const QString& type, const QString& info, Ma
     //* 仅在第一次调用时传参 map_init，形成闭包
     static Map* map = map_init;
     map->ui->text_log->appendHtml(QString(R"(<html><head/><body><p>
-                <span style=" font-weight:600;color:#%1;">
+                <span style=" font-weight:600;color:%1;">
                 %2 </span>%3</p></body></html>)")
                                       .arg(color)
                                       .arg(type)

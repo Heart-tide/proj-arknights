@@ -33,7 +33,7 @@ public:
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 protected:
-    int _move_speed; //* 每步移动的距离
+    int _move_speed; //* 每帧移动的距离
     QVector<Place*> _route;
     QPair<int, int> direction;
 };

@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
     setWindowTitle("Arknights");
-    new GameState(20, 100, 3, 1, this);
+    new GameState(20, 100, 3, 3, this);
 }
 
 MainWindow::~MainWindow()

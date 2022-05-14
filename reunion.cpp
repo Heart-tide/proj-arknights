@@ -22,14 +22,15 @@ Reunion::Reunion(size_t health, int damage, size_t interval,
 void Reunion::move(size_t& hp)
 {
     setGeometry(x() + direction.first, y() + direction.second, 90, 90);
-    if (x() == _route.back()->x() + 10 && y() == _route.back()->y()) {
+    //* 判断是否到达下一个路径点，误差一个像素点，以便速度可以设为 3
+    if (abs(x() - (_route.back()->x() + 10)) <= 1 && abs(y() - _route.back()->y()) <= 1) {
         removeFrom();
         addTo(_route.back());
         _route.pop_back();
         direction.first = (_route.back()->x() - _place->x()) / 100 * _move_speed;
         direction.second = (_route.back()->y() - _place->y()) / 100 * _move_speed;
         if (_place->isBase()) {
-            printLog("ff9933", "BASE", QString("HP %2 -> %3").arg(hp).arg(hp - 1));
+            printLog("#ff9933", "BASE", QString("HP %2 -> %3").arg(hp).arg(hp - 1));
             _is_active = false;
             if (--hp == 0) {
                 throw LoseGameException();
@@ -44,7 +45,7 @@ void Reunion::attack(Infected* op)
     auto op_place = op->givePlace(); //* 提前保存干员所在地块，不然一会受击死亡后就找不到了
     op->reduceHealth(_damage);
     if (!op->isActive()) {
-        printLog("ff9933", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(op->giveName()).arg(op_place->giveID()));
+        printLog("#ff9933", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(op->giveName()).arg(op_place->giveID()));
         op->hide();
     }
 }

@@ -4,7 +4,7 @@
 #include <QString>
 #include <ctime>
 
-GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_speed, QWidget* parent)
+GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_dp, QWidget* parent)
     : QWidget(parent)
     , _map(new Map(this, this))
     , _timer(new QTimer(this))
@@ -12,9 +12,9 @@ GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_
     , _create_interval(create_intervel)
     , _reunion_dp(0)
     , _time(0)
-    , _dp(0)
+    , _dp(default_dp)
     , _hp(total_hp)
-    , _speed(default_speed)
+    , _speed(1)
     , _gameover(false)
 {
     connectWithWidgets();
@@ -33,10 +33,10 @@ void GameState::connectWithWidgets()
     connect(ui->push_speed, &QPushButton::clicked, this, [=]() {
         if (_speed == 1) {
             ui->push_speed->setStyleSheet("image: url(:/res/photo/speed_2x.png);");
-            printLog("0000ff", "SPEED", "UP");
+            printLog("#9999ff", "SPEED", "UP");
         } else {
             ui->push_speed->setStyleSheet("image: url(:/res/photo/speed_1x.png);");
-            printLog("0000ff", "SPEED", "DOWN");
+            printLog("#9999ff", "SPEED", "DOWN");
         }
         _speed = 3 - _speed;
         _timer->setInterval(20 / _speed);
@@ -44,7 +44,7 @@ void GameState::connectWithWidgets()
     connect(ui->push_pause, &QPushButton::clicked, this, [=]() {
         if (_timer->isActive()) {
             ui->push_pause->setStyleSheet("image: url(:/res/photo/continue.png);");
-            printLog("0000ff", "TIME", "PAUSE");
+            printLog("#9999ff", "TIME", "PAUSE");
             _timer->stop();
             //* 停止所有对象的攻击动作
             for (auto it = _active_operators.begin(); it < _active_operators.end(); it++) {
@@ -55,7 +55,7 @@ void GameState::connectWithWidgets()
             }
         } else if (!_timer->isActive() && !_gameover) {
             ui->push_pause->setStyleSheet("image: url(:/res/photo/stop.png);");
-            printLog("0000ff", "TIME", "CONTINUE");
+            printLog("#9999FF", "TIME", "CONTINUE");
             _timer->start();
         }
     });
@@ -74,7 +74,7 @@ void GameState::update()
         //* 检测游戏结束
         emit _map->ui->push_pause->clicked(); //* 暂停计时器
         _gameover = true;
-        printLog("3300ff", exception.what(), "");
+        printLog("#39C5BB", exception.what(), "");
     }
     _map->ui->label_enemy_stats->setText(QString::number(_enemy_stats)); //* 仅显示未出现的敌人数
     _map->ui->label_hp->setText(QString::number(_hp));
@@ -106,7 +106,7 @@ void GameState::deployOperator(size_t choice, Place* place, Orientation orientat
     // _map->_operatorSelected = -1; //* 永远不清空干员预置栏
     _dp -= op->giveCost();
     _active_operators.push_back(op);
-    printLog("33cccc", "DEPLOY", QString("%1 %2").arg(op->giveName()).arg(op->givePlace()->giveID()));
+    printLog("#33cccc", "DEPLOY", QString("%1 %2").arg(op->giveName()).arg(op->givePlace()->giveID()));
 }
 
 //* 场上所有 active 的 operator 按其生成次序行动

@@ -15,7 +15,7 @@ class GameState : public QWidget {
 public:
     friend void deployOperator(GameState* gamestate, Place* place, int orientation);
 
-    GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_speed, QWidget* parent);
+    GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_dp, QWidget* parent);
     void connectWithWidgets();
 
     void update();
