@@ -2,7 +2,7 @@
 #include <cmath>
 
 Reunion::Reunion(size_t health, int damage, size_t interval,
-    size_t deployment_time, size_t move_speed,
+    size_t deployment_time, float move_speed,
     size_t id, QVector<Place*> route, QWidget* parent,
     QMovie* idle_movie, QMovie* attack_movie)
     : Infected(health, damage, interval, route.back(),
@@ -32,6 +32,7 @@ void Reunion::move(size_t& hp, Map* map)
     }
     if (_remaining_direction[0].y() > 1) {
         next_y += _direction[1].y();
+        //? 220515将setY写作setY，在此debug半个小时
         _remaining_direction[0].setY(_remaining_direction[0].y() - 1);
     }
     setGeometry(next_x, next_y, 90, 90);
@@ -139,7 +140,7 @@ GroundReunion::GroundReunion(size_t health,
     int damage,
     size_t interval,
     size_t deployment_time,
-    size_t move_speed,
+    float move_speed,
     size_t id,
     QVector<Place*> route,
     QWidget* parent,
@@ -184,7 +185,7 @@ UAV::UAV(size_t health,
     int damage,
     size_t interval,
     size_t deployment_time,
-    size_t move_speed,
+    float move_speed,
     size_t id,
     QVector<Place*> route,
     QWidget* parent,
@@ -225,10 +226,34 @@ void UAV::paintEvent(QPaintEvent* event)
 }
 
 Yuan::Yuan(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(50, 5, 30, deployment_time, 2, id, route, parent,
+    : GroundReunion(40, 5, 35, deployment_time, 2, id, route, parent,
         new QMovie("://res/reunion/yuan-idle.gif"),
-        new QMovie("://res/reunion/yuan-attack.gif")) //* 源石虫攻击力限时 UP !
+        new QMovie("://res/reunion/yuan-attack.gif")) //* 源石虫攻击力限时 UP 已结束 !
 {
+}
+
+Soldier::Soldier(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
+    : GroundReunion(60, 7, 40, deployment_time, 2.3, id, route, parent,
+        new QMovie("://res/reunion/soldier-idle.gif"),
+        new QMovie("://res/reunion/soldier-attack.gif"))
+{
+}
+
+Revenger::Revenger(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
+    : GroundReunion(120, 10, 50, deployment_time, 1.5, id, route, parent,
+        new QMovie("://res/reunion/revenger-idle.gif"),
+        new QMovie("://res/reunion/revenger-attack.gif"))
+    , _low_health(false)
+{
+}
+
+void Revenger::attack(Infected* op)
+{
+    if (_low_health == false && _health <= 0.5 * _max_health) {
+        _low_health = true;
+        _damage *= 2;
+    }
+    Reunion::attack(op);
 }
 
 Monster::Monster(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)

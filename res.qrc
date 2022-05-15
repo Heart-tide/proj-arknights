@@ -23,5 +23,9 @@
         <file>res/place/base.png</file>
         <file>res/place/entrance.png</file>
         <file>res/place/common.png</file>
+        <file>res/reunion/soldier-attack.gif</file>
+        <file>res/reunion/soldier-idle.gif</file>
+        <file>res/reunion/revenger-attack.gif</file>
+        <file>res/reunion/revenger-idle.gif</file>
     </qresource>
 </RCC>

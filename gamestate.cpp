@@ -193,17 +193,20 @@ Reunion* GameState::createRandomReunion()
 {
     static size_t id_counter = 0;
     srand(static_cast<unsigned>(clock()));
-    size_t choice = rand() % 3;
+    size_t choice = rand() % 4;
     //* 若无空中路径，仅生成地面敌人
-    if (choice >= 2 && _map->_routes[true].empty()) {
-        choice %= 2;
+    if (choice >= 3 && _map->_routes[true].empty()) {
+        choice %= 3;
     }
     //* 地面敌人在前，空中敌人在后
     switch (choice) {
     case 0:
+        return new Soldier(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
     case 1:
         return new Yuan(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
     case 2:
+        return new Revenger(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
+    case 3:
         return new Monster(_time, id_counter++, giveRandomUnit(_map->_routes[true]), this);
     default:
         return nullptr;
@@ -237,8 +240,8 @@ Infected* GameState::properAttackedOperator(Reunion* reunion) const
     int a = 2 * reunion->giveAttackArea() + 1;
     for (int i = max(x, 0); i < min<int>(x + a, _map->giveWidth()); i++) {
         for (int j = max(y, 0); j < min<int>(y + a, _map->giveHeight()); j++) {
-            //* 要不整合运动是飞行单位，要不我方干员是地面单位
-            if ((*_map)[j][i]->giveOperator() && (is_flying || (*_map)[j][i]->isLower())) {
+            //* 暂时不做敌人的远程单位近战单位的区分，仅按攻击范围来看
+            if ((*_map)[j][i]->giveOperator()) {
                 return (*_map)[j][i]->giveOperator();
             }
         }
