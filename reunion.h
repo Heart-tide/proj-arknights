@@ -2,22 +2,21 @@
 #define REUNION_H
 
 #include "infected.h"
+#include <QVector2D>
 #include <QVector>
 #include <QWidget>
-
-class Place;
 
 class Reunion : public Infected {
     Q_OBJECT
 
 public:
     Reunion(size_t health, int damage, size_t interval,
-        Place* place, size_t deployment_time, size_t move_speed,
+        size_t deployment_time, size_t move_speed,
         size_t id, QVector<Place*> route, QWidget* parent,
         QMovie* idle_movie, QMovie* attack_movie);
 
-    virtual void action(size_t time, size_t& hp, Infected* op) = 0;
-    void move(size_t& hp);
+    virtual void action(size_t time, size_t& hp, Infected* op, Map* map) = 0;
+    void move(size_t& hp, Map* map);
     void attack(Infected* op);
 
     void addTo(Place* place) override;
@@ -33,9 +32,13 @@ public:
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 protected:
-    int _move_speed; //* 每帧移动的距离
+    Place* adjacentPlace(Map* map);
+    void chooseDirection();
+
+    int _move_speed; //* 每帧移动的距离倍数
     QVector<Place*> _route;
-    QPair<int, int> direction;
+    QPoint _direction[2]; //* 存储每帧移动长度的整数部分，0 号位存储值本身，1 号位存储单位化值
+    QVector2D _remaining_direction[2]; //* 存储每帧移动长度的小数部分，0 号位累计存储，1 号位存储单位剩余长度
 };
 
 //************* 地面单位 *************
@@ -44,11 +47,11 @@ class GroundReunion : public Reunion {
 
 public:
     GroundReunion(size_t health, int damage, size_t interval,
-        Place* place, size_t deployment_time, size_t move_speed,
+        size_t deployment_time, size_t move_speed,
         size_t id, QVector<Place*> route, QWidget* parent,
         QMovie* idle_movie, QMovie* attack_movie);
 
-    void action(size_t time, size_t& hp, Infected* op) override;
+    void action(size_t time, size_t& hp, Infected* op, Map* map) override;
     QString giveName() const override { return "GroundReunion"; }
 
     void paintEvent(QPaintEvent*) override;
@@ -58,8 +61,7 @@ class Yuan : public GroundReunion {
     Q_OBJECT
 
 public:
-    Yuan(Place* place, size_t deployment_time,
-        size_t id, QVector<Place*> route, QWidget* parent);
+    Yuan(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent);
 
     QString giveName() const override { return "Yuan"; }
     int giveAttackArea() const override { return 0; }
@@ -70,12 +72,11 @@ class UAV : public Reunion {
     Q_OBJECT
 
 public:
-    UAV(size_t health, int damage, size_t interval,
-        Place* place, size_t deployment_time, size_t move_speed,
-        size_t id, QVector<Place*> route, QWidget* parent,
+    UAV(size_t health, int damage, size_t interval, size_t deployment_time,
+        size_t move_speed, size_t id, QVector<Place*> route, QWidget* parent,
         QMovie* idle_movie, QMovie* attack_movie);
 
-    void action(size_t time, size_t& hp, Infected* op) override;
+    void action(size_t time, size_t& hp, Infected* op, Map* map) override;
     bool isFlying() override { return true; }
     QString giveName() const override { return "UAV"; }
 
@@ -86,8 +87,7 @@ class Monster : public UAV {
     Q_OBJECT
 
 public:
-    Monster(Place* place, size_t deployment_time,
-        size_t id, QVector<Place*> route, QWidget* parent);
+    Monster(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent);
 
     QString giveName() const override { return "Monster"; }
     int giveAttackArea() const override { return 1; }

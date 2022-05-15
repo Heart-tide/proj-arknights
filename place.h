@@ -32,7 +32,6 @@ public:
     virtual bool isEntrance() { return false; }
     virtual bool isLower() { return false; }
     virtual bool isHigher() { return false; }
-    virtual bool isReachable() { return false; } //* 指整合运动地面部队能否到达该地块
 
     Infected* giveOperator() { return _op; }
     QVector<Infected*>& giveReunions() { return _reunions; }
@@ -54,7 +53,7 @@ protected:
 
 //* 这里是特殊地块
 
-//* 不可到达，编号 4
+//* 特殊地块，编号 4
 class SpecialPlace : public Place {
     Q_OBJECT
 
@@ -73,7 +72,6 @@ class Base : public SpecialPlace {
 public:
     Base(GameState* gamestate, QWidget* parent);
     bool isBase() override { return true; }
-    bool isReachable() override { return true; }
 };
 
 //* 敌方入口，编号 1
@@ -83,7 +81,6 @@ class Entrance : public SpecialPlace {
 public:
     Entrance(GameState* gamestate, QWidget* parent);
     bool isEntrance() override { return true; }
-    bool isReachable() override { return true; }
 };
 
 //* 这里是低地和高地
@@ -95,7 +92,6 @@ class LowerPlace : public Place {
 public:
     LowerPlace(GameState* gamestate, QWidget* parent);
     bool isLower() override { return true; }
-    bool isReachable() override { return true; }
 };
 
 //* 高地，编号 3
@@ -106,5 +102,13 @@ public:
     HigherPlace(GameState* gamestate, QWidget* parent);
     bool isHigher() override { return true; }
 };
+
+//* 给出任意单位，用于整合运动的初始入口确定
+template <class T>
+T giveRandomUnit(QVector<T>& units)
+{
+    srand(static_cast<unsigned>(clock()));
+    return units[rand() % units.size()];
+}
 
 #endif // PLACE_H

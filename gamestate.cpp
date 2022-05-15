@@ -14,6 +14,7 @@ GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_
     , _time(0)
     , _dp(default_dp)
     , _hp(total_hp)
+    , _total_hp(total_hp)
     , _speed(1)
     , _gameover(false)
 {
@@ -22,8 +23,7 @@ GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_
     connect(_timer, &QTimer::timeout, this, &GameState::update);
     _timer->start(20 / _speed); //* 20ms 更新一次！
 
-    resize(static_cast<QWidget*>(this->parent())->size()); //* 将自身大小改为父对象大小
-    _map->resize(static_cast<QWidget*>(this->parent())->size());
+    resize(_map->size()); //* 按载入的 map 大小修改自身大小
 }
 
 //* 与 ui 中所有的控件 connect
@@ -59,6 +59,9 @@ void GameState::connectWithWidgets()
             _timer->start();
         }
     });
+    //* 将按钮们置顶，避免被地图块所遮盖
+    ui->push_speed->raise();
+    ui->push_pause->raise();
 }
 
 //* update 函数，与 gamestate 计时器 connect
@@ -74,7 +77,7 @@ void GameState::update()
         //* 检测游戏结束
         emit _map->ui->push_pause->clicked(); //* 暂停计时器
         _gameover = true;
-        printLog("#39C5BB", exception.what(), "");
+        printLog("#39C5BB", exception.what(), QString("( HP %1 / %2 )").arg(_hp).arg(_total_hp), nullptr, true);
     }
     _map->ui->label_enemy_stats->setText(QString::number(_enemy_stats)); //* 仅显示未出现的敌人数
     _map->ui->label_hp->setText(QString::number(_hp));
@@ -173,11 +176,14 @@ Infected* GameState::properAttackedReunion(Operator* op) const
 //* 生成 Reunion
 void GameState::reunionStragegy()
 {
+    //* 若无任何路径，则进入地图编辑器模式，不出怪
+    if ((_map->_routes[false].empty()) && (_map->_routes[true].empty())) {
+        return;
+    }
     if (_time % _create_interval != 1 || _enemy_stats == 0)
         return;
     _enemy_stats--;
     auto reunion = createRandomReunion();
-    reunion->addTo(_map->_entrance);
     _active_reunions.push_back(reunion);
     // printLog(QString("CREATE %1 # %2").arg(reunion->giveName()).arg(reunion->giveID()));
 }
@@ -187,14 +193,18 @@ Reunion* GameState::createRandomReunion()
 {
     static size_t id_counter = 0;
     srand(static_cast<unsigned>(clock()));
-    switch (rand() % 3) {
+    size_t choice = rand() % 3;
+    //* 若无空中路径，仅生成地面敌人
+    if (choice >= 2 && _map->_routes[true].empty()) {
+        choice %= 2;
+    }
+    //* 地面敌人在前，空中敌人在后
+    switch (choice) {
     case 0:
     case 1:
-        return new Yuan(_map->_entrance, _time, id_counter++,
-            _map->giveRandomRoute(false), this);
+        return new Yuan(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
     case 2:
-        return new Monster(_map->_entrance, _time, id_counter++,
-            _map->giveRandomRoute(true), this);
+        return new Monster(_time, id_counter++, giveRandomUnit(_map->_routes[true]), this);
     default:
         return nullptr;
     }
@@ -206,7 +216,7 @@ void GameState::reunionAction()
     QVector<Reunion*> still_active;
     for (auto it = _active_reunions.begin(); it < _active_reunions.end(); it++) {
         if ((*it)->isActive()) {
-            (*it)->action(_time, _hp, properAttackedOperator(*it));
+            (*it)->action(_time, _hp, properAttackedOperator(*it), _map);
             still_active.push_back(*it);
         } else {
             delete (*it);

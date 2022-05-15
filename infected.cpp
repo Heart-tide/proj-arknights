@@ -42,9 +42,3 @@ void Infected::timerEvent(QTimerEvent*)
 {
     update();
 }
-
-Infected* giveRandomInfected(QVector<Infected*>& infecteds)
-{
-    srand(static_cast<unsigned>(clock()));
-    return infecteds[rand() % infecteds.size()];
-}

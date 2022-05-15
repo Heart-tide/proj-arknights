@@ -42,6 +42,7 @@ private:
     size_t _time;
     size_t _dp; //* dp means Deployment Point
     size_t _hp;
+    size_t _total_hp;
 
     size_t _speed;
     bool _gameover;

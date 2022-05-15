@@ -1,35 +1,54 @@
 #include "reunion.h"
+#include <cmath>
 
 Reunion::Reunion(size_t health, int damage, size_t interval,
-    Place* place, size_t deployment_time, size_t move_speed,
+    size_t deployment_time, size_t move_speed,
     size_t id, QVector<Place*> route, QWidget* parent,
     QMovie* idle_movie, QMovie* attack_movie)
-    : Infected(health, damage, interval, place,
+    : Infected(health, damage, interval, route.back(),
         deployment_time, id, parent, idle_movie, attack_movie)
     , _move_speed(move_speed)
     , _route(route)
 {
+    addTo(_route.back());
     _route.pop_back();
     //? _move_speed 原为无符号整数，运算时出大问题！以后运算前先检查各操作数类型！！！
-    direction.first = (_route.back()->x() - _place->x()) / 100 * _move_speed;
-    direction.second = (_route.back()->y() - _place->y()) / 100 * _move_speed;
+    chooseDirection();
     setGeometry(_place->x() + 10, _place->y(), 90, 90);
     //? 要show才能调用绘图事件！！！
     show();
 }
 
 //* 移动！
-void Reunion::move(size_t& hp)
+void Reunion::move(size_t& hp, Map* map)
 {
-    setGeometry(x() + direction.first, y() + direction.second, 90, 90);
-    //* 判断是否到达下一个路径点，误差一个像素点，以便速度可以设为 3
-    if (abs(x() - (_route.back()->x() + 10)) <= 1 && abs(y() - _route.back()->y()) <= 1) {
+    //* 将移动的余数补全，并进行一次移动
+    _remaining_direction[0] += _remaining_direction[1];
+    int next_x = x() + _direction[0].x();
+    int next_y = y() + _direction[0].y();
+    if (_remaining_direction[0].x() > 1) {
+        next_x += _direction[1].x();
+        _remaining_direction[0].setX(_remaining_direction[0].x() - 1);
+    }
+    if (_remaining_direction[0].y() > 1) {
+        next_y += _direction[1].y();
+        _remaining_direction[0].setY(_remaining_direction[0].y() - 1);
+    }
+    setGeometry(next_x, next_y, 90, 90);
+    //* 每次移动都寻找临近格子并与下一路径点作比较
+    Place* adjacent_place = adjacentPlace(map);
+    int delta_x = abs(x() - (adjacent_place->x() + 10));
+    int delta_y = abs(y() - adjacent_place->y());
+    //* 误差 30 个像素，寻找临近格子作归属
+    if (_place != adjacent_place && delta_x <= 30 && delta_y <= 30) {
         removeFrom();
-        addTo(_route.back());
-        _route.pop_back();
-        direction.first = (_route.back()->x() - _place->x()) / 100 * _move_speed;
-        direction.second = (_route.back()->y() - _place->y()) / 100 * _move_speed;
-        if (_place->isBase()) {
+        addTo(adjacent_place);
+    } else if (delta_x <= 2 && delta_y <= 2) {
+        if (adjacent_place == _route.back()) {
+            _route.pop_back();
+            chooseDirection();
+        }
+        if (_route.empty()) {
             printLog("#ff9933", "BASE", QString("HP %2 -> %3").arg(hp).arg(hp - 1));
             _is_active = false;
             if (--hp == 0) {
@@ -86,10 +105,39 @@ void Reunion::mouseReleaseEvent(QMouseEvent* event)
     return _place->mouseReleaseEvent(event);
 }
 
+Place* Reunion::adjacentPlace(Map* map)
+{
+    auto adjacentPlaceCoordinate = [=](int xy) {
+        if (xy % 100 >= 50) {
+            xy += 100;
+        }
+        return xy / 100;
+    };
+    int place_j = adjacentPlaceCoordinate(x());
+    int place_i = adjacentPlaceCoordinate(y());
+    return (*map)[place_i][place_j];
+}
+
+void Reunion::chooseDirection()
+{
+    if (_route.empty()) {
+        return;
+    }
+    QVector2D delta_distance(_route.back()->pos() - _place->pos());
+    QVector2D direction_float(delta_distance.normalized() * _move_speed);
+    //* 将 float 型隐式转化为 int 型，向 0 取整
+    _direction[0].setX(direction_float.x());
+    _direction[0].setY(direction_float.y());
+    _direction[1].setX(direction_float.x() > 0 ? 1 : -1);
+    _direction[1].setY(direction_float.y() > 0 ? 1 : -1);
+    //* 这里存储移动方向余数的绝对值
+    _remaining_direction[0] = _remaining_direction[1]
+        = QVector2D(abs(direction_float.x() - _direction[0].x()), abs(direction_float.y() - _direction[0].y()));
+}
+
 GroundReunion::GroundReunion(size_t health,
     int damage,
     size_t interval,
-    Place* place,
     size_t deployment_time,
     size_t move_speed,
     size_t id,
@@ -97,11 +145,11 @@ GroundReunion::GroundReunion(size_t health,
     QWidget* parent,
     QMovie* idle_movie,
     QMovie* attack_movie)
-    : Reunion(health, damage, interval, place, deployment_time, move_speed, id, route, parent, idle_movie, attack_movie)
+    : Reunion(health, damage, interval, deployment_time, move_speed, id, route, parent, idle_movie, attack_movie)
 {
 }
 
-void GroundReunion::action(size_t time, size_t& hp, Infected* op)
+void GroundReunion::action(size_t time, size_t& hp, Infected* op, Map* map)
 {
     //? 220428 因将==误写作=，在此debug半个钟头
     if (op) {
@@ -112,14 +160,14 @@ void GroundReunion::action(size_t time, size_t& hp, Infected* op)
         attack(op);
     } else {
         _is_attacking = false;
-        move(hp);
+        move(hp, map);
     }
 }
 
 void GroundReunion::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    //* 画敌人
+    //* 画地面敌人
     if (_is_attacking) {
         _attack_movie->start();
         _idle_movie->stop();
@@ -135,7 +183,6 @@ void GroundReunion::paintEvent(QPaintEvent* event)
 UAV::UAV(size_t health,
     int damage,
     size_t interval,
-    Place* place,
     size_t deployment_time,
     size_t move_speed,
     size_t id,
@@ -143,11 +190,11 @@ UAV::UAV(size_t health,
     QWidget* parent,
     QMovie* idle_movie,
     QMovie* attack_movie)
-    : Reunion(health, damage, interval, place, deployment_time, move_speed, id, route, parent, idle_movie, attack_movie)
+    : Reunion(health, damage, interval, deployment_time, move_speed, id, route, parent, idle_movie, attack_movie)
 {
 }
 
-void UAV::action(size_t time, size_t& hp, Infected* op)
+void UAV::action(size_t time, size_t& hp, Infected* op, Map* map)
 {
     if (op && time - _last_action_time >= _interval) {
         //* 攻击！
@@ -158,36 +205,34 @@ void UAV::action(size_t time, size_t& hp, Infected* op)
     } else if (op == nullptr) {
         _is_attacking = false;
     }
-    move(hp);
+    move(hp, map);
 }
 
 void UAV::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    //* 画敌人
+    //* 画无人机
     if (_is_attacking) {
         _attack_movie->start();
         _idle_movie->stop();
-        painter.drawPixmap(-35, -105, 200, 200, _attack_movie->currentPixmap());
+        painter.drawPixmap(-50, -100, 200, 200, _attack_movie->currentPixmap());
     } else {
         _idle_movie->start();
         _attack_movie->stop();
-        painter.drawPixmap(-35, -105, 200, 200, _idle_movie->currentPixmap());
+        painter.drawPixmap(-50, -100, 200, 200, _idle_movie->currentPixmap());
     }
     Reunion::paintEvent(event);
 }
 
-Yuan::Yuan(Place* place, size_t deployment_time,
-    size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(50, 5, 30, place, deployment_time, 2, id, route, parent,
+Yuan::Yuan(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
+    : GroundReunion(50, 5, 30, deployment_time, 2, id, route, parent,
         new QMovie("://res/reunion/yuan-idle.gif"),
         new QMovie("://res/reunion/yuan-attack.gif")) //* 源石虫攻击力限时 UP !
 {
 }
 
-Monster::Monster(Place* place, size_t deployment_time,
-    size_t id, QVector<Place*> route, QWidget* parent)
-    : UAV(25, 10, 50, place, deployment_time, 4, id, route, parent,
+Monster::Monster(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
+    : UAV(25, 10, 50, deployment_time, 3, id, route, parent,
         new QMovie("://res/reunion/monster-idle.gif"),
         new QMovie("://res/reunion/monster-attack.gif"))
 {

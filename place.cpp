@@ -61,6 +61,7 @@ void Place::mousePressEvent(QMouseEvent* event)
 {
     //? 小心生成了但没进 map 的格子，它们也占空间！！！
     //? 减少子父对象的层数，否则对象的覆盖关系会令人迷惑，并使得鼠标点击事件被父对象截获
+    printf("%d %d ", _id.first, _id.second); //* 该行用于快速生成路径
     if (event->button() == Qt::LeftButton) {
         _prees_point = event->pos();
     }

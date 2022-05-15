@@ -54,8 +54,6 @@ protected:
     bool _is_attacking;
 };
 
-Infected* giveRandomInfected(QVector<Infected*>& infecteds);
-
 //**************** 胜利和失败条件 ****************
 class GameOverException : public QException {
     //* QException 不能书写 QObject 标识

@@ -73,10 +73,10 @@ void Operator::paintEvent(QPaintEvent*)
     QBrush red_brush(QColor("#EE0000"));
     painter.setBrush(red_brush);
     float rate = 1.0 * _health / _max_health;
-    painter.drawRect(10, 5, rate * 80, 5);
+    painter.drawRect(15, 5, rate * 80, 5);
     //* 说明血量
     painter.setPen(QPen(Qt::green, 5));
-    painter.drawText(10, 10, QString::number(_health) + " / " + QString::number(_max_health));
+    painter.drawText(15, 10, QString::number(_health) + " / " + QString::number(_max_health));
     //* 说明朝向
     switch (_orientation) {
     case UP:
@@ -143,7 +143,7 @@ Kroos::Kroos(HigherPlace* higher_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Sniper(40, 7, 20, higher_place, deployment_time, id, parent, orientation,
+    : Sniper(40, 6, 20, higher_place, deployment_time, id, parent, orientation,
         new QMovie("://res/operator/Kroos-idle.gif"),
         new QMovie("://res/operator/Kroos-attack.gif"))
 {
