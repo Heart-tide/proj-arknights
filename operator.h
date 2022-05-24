@@ -37,6 +37,7 @@ public:
     virtual Infected* findAttacked() const;
 
     void paintEvent(QPaintEvent*) override;
+    void mousePressEvent(QMouseEvent* event) override;
 
 protected:
     Orientation _orientation;
@@ -117,6 +118,7 @@ public:
     QPair<int, int> giveAttackArea() const override { return QPair<int, int>(3, 4); }
 
     Infected* findAttacked() const override;
+    void attack(Infected* attacked) override;
 };
 
 class HoneyBerry : public Doctor {
@@ -128,6 +130,7 @@ public:
 
     size_t giveCost() const override { return cost; }
     QString giveName() const override { return "HoneyBerry"; }
+    QPair<int, int> giveAttackArea() const override { return QPair<int, int>(5, 4); }
 
     static constexpr size_t cost = 15;
 };

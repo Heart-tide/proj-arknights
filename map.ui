@@ -200,6 +200,9 @@ font: 75 14pt &quot;Berlin Sans FB Demi&quot;;</string>
      <height>81</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <property name="verticalScrollBarPolicy">
     <enum>Qt::ScrollBarAlwaysOff</enum>
    </property>

@@ -34,7 +34,7 @@ void Operator::action(size_t time)
         attack(attacked);
         if (!attacked->isActive()) {
             // C++ 11 的 Raw String Literals，有助于更方便地书写字符串字面量：R"(……)"，中间可加换行
-            printLog("#ee0000", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(attacked->giveName()).arg(attacked_place->giveID()));
+            // printLog("#ee0000", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(attacked->giveName()).arg(attacked_place->giveID()));
             attacked->hide();
         }
     } else {
@@ -115,6 +115,13 @@ void Operator::paintEvent(QPaintEvent*)
     }
 }
 
+//* 展示我方干员的状态
+void Operator::mousePressEvent(QMouseEvent* event)
+{
+    printLog("#cc9900", QString("%0").arg(giveName()), QString("{HP}%1 {ATT}%2 {DEF}%3").arg(_health).arg(_damage).arg(_defense));
+    printLog("#ffffff", QString("%0").arg(giveName()), QString("{ATTSPD}%1 {BLK}%2").arg(0.02 * _interval).arg(giveBlock()));
+}
+
 Sniper::Sniper(size_t health,
     int damage,
     int defense,
@@ -178,9 +185,14 @@ Infected* Doctor::findAttacked() const
     return injured_operators.empty() ? nullptr : giveRandomUnit(injured_operators); //* 注意不能除零
 }
 
+void Doctor::attack(Infected* attacked)
+{
+    attacked->increaseHealth(_damage);
+}
+
 HoneyBerry::HoneyBerry(HigherPlace* higher_place, size_t deployment_time,
     size_t id, QWidget* parent, Orientation orientation)
-    : Doctor(125, -30, 9, 95, higher_place, deployment_time, id, parent, orientation,
+    : Doctor(125, 30, 9, 143, higher_place, deployment_time, id, parent, orientation,
         new QMovie("://res/operator/HoneyBerry-idle.gif"),
         new QMovie("://res/operator/HoneyBerry-attack.gif"))
 {

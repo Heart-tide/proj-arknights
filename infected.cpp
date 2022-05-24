@@ -28,14 +28,20 @@ Infected::Infected(size_t health, int damage, int defense, size_t interval,
 void Infected::reduceHealth(int damage)
 {
     _health -= max<double>(0.1 * damage, damage - _defense);
-    if (_health > _max_health) {
-        _health = _max_health;
-    } else if (_health <= 0) {
+    if (_health <= 0) {
         removeFrom();
         _is_active = false;
         //* 若死亡，直接释放资源，减少卡顿
         delete _idle_movie;
         delete _attack_movie;
+    }
+}
+
+void Infected::increaseHealth(int damage)
+{
+    _health += damage;
+    if (_health > _max_health) {
+        _health = _max_health;
     }
 }
 

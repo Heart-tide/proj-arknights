@@ -20,6 +20,7 @@ public:
         QMovie* idle_movie, QMovie* attack_movie);
 
     void reduceHealth(int damage);
+    void increaseHealth(int damage);
     virtual void attack(Infected*) = 0;
     void stopAttacking() { _is_attacking = false; }
 
