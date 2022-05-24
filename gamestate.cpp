@@ -104,6 +104,11 @@ void GameState::deployOperator(size_t choice, Place* place, Orientation orientat
             op = new Kroos(dynamic_cast<HigherPlace*>(place), _time, id_counter++, this, orientation);
         }
         break;
+    case 2:
+        if (HoneyBerry::cost <= _dp) {
+            op = new HoneyBerry(dynamic_cast<HigherPlace*>(place), _time, id_counter++, this, orientation);
+        }
+        break;
     }
     if (op == nullptr) {
         return;
@@ -267,6 +272,7 @@ void deployOperator(GameState* gamestate, Place* place, int orientation)
         }
         break;
     case 1:
+    case 2:
         if (place->isHigher()) {
             gamestate->deployOperator(choice, place, static_cast<Orientation>(orientation));
         }

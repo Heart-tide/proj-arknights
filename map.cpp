@@ -35,6 +35,10 @@ void Map::connectOperators()
         _operatorSelected = 1;
         printLog("#cc00cc", "CHOOSE", "Kroos");
     });
+    connect(ui->photo_honey_berry, &QPushButton::clicked, this, [=]() {
+        _operatorSelected = 2;
+        printLog("#cc00cc", "CHOOSE", "HoneyBerry");
+    });
 }
 
 //* 让窗口部件大小自适应地图大小
@@ -56,6 +60,7 @@ void Map::arrangeUiWidgets()
     //* 3. photos of operators
     ui->photo_irene->setGeometry((width - 1) * 100, height * 100, 100, 100);
     ui->photo_kroos->setGeometry((width - 2) * 100, height * 100, 100, 100);
+    ui->photo_honey_berry->setGeometry((width - 3) * 100, height * 100, 100, 100);
 }
 
 //* 读取在 map 文件夹下的所有地图文件

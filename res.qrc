@@ -27,5 +27,8 @@
         <file>res/reunion/soldier-idle.gif</file>
         <file>res/reunion/revenger-attack.gif</file>
         <file>res/reunion/revenger-idle.gif</file>
+        <file>res/photo/HoneyBerry.png</file>
+        <file>res/operator/HoneyBerry-attack.gif</file>
+        <file>res/operator/HoneyBerry-idle.gif</file>
     </qresource>
 </RCC>

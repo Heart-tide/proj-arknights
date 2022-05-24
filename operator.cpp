@@ -58,8 +58,6 @@ void Operator::removeFrom()
 //* 找到干员的攻击目标
 Infected* Operator::findAttacked() const
 {
-    //* 先列后行进行遍历
-    //? 从 先行后列 到 先x后y 的转换，需要多加注意！以后都应写成 先x后y，更通用。
     bool is_ground_to_air = isGroundToAir();
     for (auto place = _attack_places.cbegin(); place < _attack_places.cend(); place++) {
         for (auto reunion = (*place)->giveReunions().cbegin(); reunion < (*place)->giveReunions().cend(); reunion++) {
@@ -144,13 +142,33 @@ Guard::Guard(size_t health,
 }
 
 Doctor::Doctor(size_t health, int damage, size_t interval,
-    LowerPlace* lower_place, size_t deployment_time,
+    HigherPlace* higher_place, size_t deployment_time,
     size_t id, QWidget* parent, Orientation orientation,
     QMovie* idle_movie, QMovie* attack_movie)
-    : Operator(health, damage, interval, lower_place, deployment_time,
+    : Operator(health, damage, interval, higher_place, deployment_time,
         id, parent, orientation, idle_movie, attack_movie)
 {
     setGeometry(_place->x() - 5, _place->y() - 8, 100, 100);
+}
+
+Infected* Doctor::findAttacked() const
+{
+    QVector<Infected*> injured_operators;
+    for (auto place = _attack_places.cbegin(); place < _attack_places.cend(); place++) {
+        Infected* op = (*place)->giveOperator();
+        if (op != nullptr && op->healthReduced()) {
+            injured_operators.push_back(op);
+        }
+    }
+    return injured_operators.empty() ? nullptr : giveRandomUnit(injured_operators); //* 注意不能除零
+}
+
+HoneyBerry::HoneyBerry(HigherPlace* higher_place, size_t deployment_time,
+    size_t id, QWidget* parent, Orientation orientation)
+    : Doctor(30, -10, 30, higher_place, deployment_time, id, parent, orientation,
+        new QMovie("://res/operator/HoneyBerry-idle.gif"),
+        new QMovie("://res/operator/HoneyBerry-attack.gif"))
+{
 }
 
 Irene::Irene(LowerPlace* lower_place,

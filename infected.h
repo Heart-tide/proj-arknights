@@ -29,10 +29,11 @@ public:
     virtual size_t giveCost() { return 0; }
 
     size_t giveID() const { return _id; }
-    Place* givePlace() { return _place; }
-    int giveHealth() { return _health; }
+    Place* givePlace() const { return _place; }
+    int giveHealth() const { return _health; }
+    bool healthReduced() const { return _health < _max_health; }
     virtual size_t giveBlock() const { return 0; }
-    bool isActive() { return _is_active; }
+    bool isActive() const { return _is_active; }
 
     void paintEvent(QPaintEvent*) = 0;
     void timerEvent(QTimerEvent*) override;

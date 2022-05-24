@@ -33,7 +33,7 @@ public:
     virtual bool isGroundToAir() const { return false; }
 
     void setAttackPlaces(const QVector<Place*>& attack_places) { _attack_places = attack_places; }
-    Infected* findAttacked() const;
+    virtual Infected* findAttacked() const;
 
     void paintEvent(QPaintEvent*) override;
 
@@ -106,12 +106,27 @@ class Doctor : public Operator {
 
 public:
     Doctor(size_t health, int damage, size_t interval,
-        LowerPlace* lower_place, size_t deployment_time,
+        HigherPlace* higher_place, size_t deployment_time,
         size_t id, QWidget* parent, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
 
     QString giveName() const override { return "Doctor"; }
     QPair<int, int> giveAttackArea() const override { return QPair<int, int>(3, 4); }
+
+    Infected* findAttacked() const override;
+};
+
+class HoneyBerry : public Doctor {
+    Q_OBJECT
+
+public:
+    HoneyBerry(HigherPlace* higher_place, size_t deployment_time,
+        size_t id, QWidget* parent, Orientation orientation);
+
+    size_t giveCost() const override { return cost; }
+    QString giveName() const override { return "HoneyBerry"; }
+
+    static constexpr size_t cost = 5;
 };
 
 #endif // OPERATOR_H

@@ -213,6 +213,25 @@ font: 75 14pt &quot;Berlin Sans FB Demi&quot;;</string>
     <bool>false</bool>
    </property>
   </widget>
+  <widget class="QPushButton" name="photo_honey_berry">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>500</y>
+     <width>100</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">image: url(:/res/photo/HoneyBerry.png);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
