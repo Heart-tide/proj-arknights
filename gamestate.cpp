@@ -4,6 +4,8 @@
 #include <QString>
 #include <ctime>
 
+using std::function;
+
 GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_dp, QWidget* parent)
     : QWidget(parent)
     , _map(new Map(this, this))
@@ -107,6 +109,7 @@ void GameState::deployOperator(size_t choice, Place* place, Orientation orientat
         return;
     }
     // _map->_operatorSelected = -1; //* 永远不清空干员预置栏
+    findAttackPlaces(op); //* 设置该干员的攻击范围
     _dp -= op->giveCost();
     _active_operators.push_back(op);
     printLog("#33cccc", "DEPLOY", QString("%1 %2").arg(op->giveName()).arg(op->givePlace()->giveID()));
@@ -118,7 +121,7 @@ void GameState::operatorAction()
     QVector<Operator*> still_active;
     for (auto it = _active_operators.begin(); it < _active_operators.end(); it++) {
         if ((*it)->isActive()) {
-            (*it)->action(_time, properAttackedReunion(*it));
+            (*it)->action(_time);
             still_active.push_back(*it);
         } else {
             delete (*it);
@@ -128,7 +131,7 @@ void GameState::operatorAction()
 }
 
 //* 计算干员可攻击到的敌人
-Infected* GameState::properAttackedReunion(Operator* op) const
+void GameState::findAttackPlaces(Operator* op) const
 {
     int x = 0, y = 0, height = 0, width = 0;
     switch (op->giveOrientation()) {
@@ -157,20 +160,13 @@ Infected* GameState::properAttackedReunion(Operator* op) const
         y = op->givePlace()->showID().first - height / 2;
         break;
     }
-    //* 先列后行进行遍历
-    //? 从 先行后列 到 先x后y 的转换，需要多加注意！以后都应写成 先x后y，更通用。
-    bool is_ground_to_air = op->isGroundToAir();
+    QVector<Place*> attack_area;
     for (int i = max(x, 0); i < min<int>(x + width, _map->giveWidth()); i++) {
         for (int j = max(y, 0); j < min<int>(y + height, _map->giveHeight()); j++) {
-            for (auto it = (*_map)[j][i]->giveReunions().begin(); it < (*_map)[j][i]->giveReunions().end(); it++) {
-                //* 要不我方干员是可对空的，要不敌方是地面单位
-                if (is_ground_to_air || (dynamic_cast<Reunion*>(*it)->isFlying() == false)) {
-                    return (*it);
-                }
-            }
+            attack_area.push_back((*_map)[j][i]);
         }
     }
-    return nullptr;
+    op->setAttackPlaces(attack_area);
 }
 
 //* 生成 Reunion
@@ -193,20 +189,26 @@ Reunion* GameState::createRandomReunion()
 {
     static size_t id_counter = 0;
     srand(static_cast<unsigned>(clock()));
-    size_t choice = rand() % 4;
+    size_t choice = rand() % 10;
     //* 若无空中路径，仅生成地面敌人
-    if (choice >= 3 && _map->_routes[true].empty()) {
-        choice %= 3;
+    if (choice >= 7 && _map->_routes[true].empty()) {
+        choice %= 7;
     }
     //* 地面敌人在前，空中敌人在后
     switch (choice) {
     case 0:
-        return new Soldier(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
     case 1:
-        return new Yuan(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
     case 2:
-        return new Revenger(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
+        return new Yuan(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
     case 3:
+    case 4:
+        return new Soldier(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
+    case 5:
+    case 6:
+        return new Revenger(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
+    case 7:
+    case 8:
+    case 9:
         return new Monster(_time, id_counter++, giveRandomUnit(_map->_routes[true]), this);
     default:
         return nullptr;

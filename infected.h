@@ -31,6 +31,7 @@ public:
     size_t giveID() const { return _id; }
     Place* givePlace() { return _place; }
     int giveHealth() { return _health; }
+    virtual size_t giveBlock() const { return 0; }
     bool isActive() { return _is_active; }
 
     void paintEvent(QPaintEvent*) = 0;

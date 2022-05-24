@@ -153,7 +153,8 @@ GroundReunion::GroundReunion(size_t health,
 void GroundReunion::action(size_t time, size_t& hp, Infected* op, Map* map)
 {
     //? 220428 因将==误写作=，在此debug半个钟头
-    if (op) {
+    //* 干员会对阻挡最后所接敌人进行阻挡
+    if (op && op->giveBlock() >= op->givePlace()->giveReunions().size()) {
         _is_attacking = true;
         if (time - _last_action_time < _interval)
             return;
@@ -240,7 +241,7 @@ Soldier::Soldier(size_t deployment_time, size_t id, QVector<Place*> route, QWidg
 }
 
 Revenger::Revenger(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(120, 10, 50, deployment_time, 1.5, id, route, parent,
+    : GroundReunion(120, 20, 70, deployment_time, 1.5, id, route, parent,
         new QMovie("://res/reunion/revenger-idle.gif"),
         new QMovie("://res/reunion/revenger-attack.gif"))
     , _low_health(false)
@@ -257,7 +258,7 @@ void Revenger::attack(Infected* op)
 }
 
 Monster::Monster(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : UAV(25, 10, 50, deployment_time, 3, id, route, parent,
+    : UAV(25, 3, 50, deployment_time, 3, id, route, parent,
         new QMovie("://res/reunion/monster-idle.gif"),
         new QMovie("://res/reunion/monster-attack.gif"))
 {

@@ -1,4 +1,5 @@
 #include "operator.h"
+#include "reunion.h"
 
 Operator::Operator(size_t health,
     int damage,
@@ -7,13 +8,11 @@ Operator::Operator(size_t health,
     size_t deployment_time,
     size_t id,
     QWidget* parent,
-    size_t block,
     Orientation orientation,
     QMovie* idle_movie,
     QMovie* attack_movie)
     : Infected(health, damage, interval, place,
         deployment_time, id, parent, idle_movie, attack_movie)
-    , _block(block)
     , _orientation(orientation)
 {
     //? 要show才能调用绘图事件！！！
@@ -21,11 +20,12 @@ Operator::Operator(size_t health,
     _place->addOperator(this);
 }
 
-void Operator::action(size_t time, Infected* attacked)
+void Operator::action(size_t time)
 {
     if (_is_active == false || (time - _last_action_time) < _interval) {
         return;
     }
+    Infected* attacked = findAttacked();
     if (attacked) { //* 暂时无视阻挡数要求
         _is_attacking = true;
         _last_action_time = time;
@@ -53,6 +53,23 @@ void Operator::removeFrom()
 {
     _place->removeOperator();
     _place = nullptr;
+}
+
+//* 找到干员的攻击目标
+Infected* Operator::findAttacked() const
+{
+    //* 先列后行进行遍历
+    //? 从 先行后列 到 先x后y 的转换，需要多加注意！以后都应写成 先x后y，更通用。
+    bool is_ground_to_air = isGroundToAir();
+    for (auto place = _attack_places.cbegin(); place < _attack_places.cend(); place++) {
+        for (auto reunion = (*place)->giveReunions().cbegin(); reunion < (*place)->giveReunions().cend(); reunion++) {
+            //* 要不我方干员是可对空的，要不敌方是地面单位
+            if (is_ground_to_air || (dynamic_cast<Reunion*>(*reunion)->isFlying() == false)) {
+                return (*reunion);
+            }
+        }
+    }
+    return nullptr;
 }
 
 //* 把干员的朝向显示出来
@@ -105,7 +122,7 @@ Sniper::Sniper(size_t health,
     QMovie* idle_movie,
     QMovie* attack_movie)
     : Operator(health, damage, interval, higher_place, deployment_time,
-        id, parent, 0, orientation, idle_movie, attack_movie)
+        id, parent, orientation, idle_movie, attack_movie)
 {
     setGeometry(_place->x() - 5, _place->y() - 8, 100, 100);
 }
@@ -117,14 +134,23 @@ Guard::Guard(size_t health,
     size_t deployment_time,
     size_t id,
     QWidget* parent,
-    size_t block,
     Orientation orientation,
     QMovie* idle_movie,
     QMovie* attack_movie)
     : Operator(health, damage, interval, lower_place, deployment_time,
-        id, parent, block, orientation, idle_movie, attack_movie)
+        id, parent, orientation, idle_movie, attack_movie)
 {
     setGeometry(_place->x() - 15, _place->y(), 100, 100);
+}
+
+Doctor::Doctor(size_t health, int damage, size_t interval,
+    LowerPlace* lower_place, size_t deployment_time,
+    size_t id, QWidget* parent, Orientation orientation,
+    QMovie* idle_movie, QMovie* attack_movie)
+    : Operator(health, damage, interval, lower_place, deployment_time,
+        id, parent, orientation, idle_movie, attack_movie)
+{
+    setGeometry(_place->x() - 5, _place->y() - 8, 100, 100);
 }
 
 Irene::Irene(LowerPlace* lower_place,
@@ -132,7 +158,7 @@ Irene::Irene(LowerPlace* lower_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Guard(70, 10, 30, lower_place, deployment_time, id, parent, 3, orientation,
+    : Guard(70, 10, 30, lower_place, deployment_time, id, parent, orientation,
         new QMovie("://res/operator/Irene-idle.gif"),
         new QMovie("://res/operator/Irene-attack.gif"))
 {
@@ -143,7 +169,7 @@ Kroos::Kroos(HigherPlace* higher_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Sniper(40, 6, 20, higher_place, deployment_time, id, parent, orientation,
+    : Sniper(30, 6, 20, higher_place, deployment_time, id, parent, orientation,
         new QMovie("://res/operator/Kroos-idle.gif"),
         new QMovie("://res/operator/Kroos-attack.gif"))
 {

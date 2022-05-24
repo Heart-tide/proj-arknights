@@ -22,7 +22,7 @@ public:
 
     void deployOperator(size_t choice, Place* place, Orientation orientation);
     void operatorAction();
-    Infected* properAttackedReunion(Operator* op) const;
+    void findAttackPlaces(Operator* op) const;
 
     void reunionStragegy();
     Reunion* createRandomReunion();
