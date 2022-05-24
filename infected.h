@@ -15,11 +15,12 @@ class Infected : public QWidget {
     Q_OBJECT
 
 public:
-    Infected(size_t health, int damage, size_t interval,
+    Infected(size_t health, int damage, int defense, size_t interval,
         Place* place, size_t deployment_time, size_t id, QWidget* parent,
         QMovie* idle_movie, QMovie* attack_movie);
 
     void reduceHealth(int damage);
+    virtual void attack(Infected*) = 0;
     void stopAttacking() { _is_attacking = false; }
 
     virtual void addTo(Place* place) = 0;
@@ -31,7 +32,7 @@ public:
     size_t giveID() const { return _id; }
     Place* givePlace() const { return _place; }
     int giveHealth() const { return _health; }
-    bool healthReduced() const { return _health < _max_health; }
+    bool isHealthReduced() const { return _health < _max_health; }
     virtual size_t giveBlock() const { return 0; }
     bool isActive() const { return _is_active; }
 
@@ -42,6 +43,8 @@ protected:
     int _health;
     const int _max_health;
     int _damage;
+    int _defense;
+
     size_t _interval; //* 连续两次攻击的间隔tick数
     size_t _last_action_time;
 
@@ -72,5 +75,18 @@ class LoseGameException : public GameOverException {
 public:
     QString what() noexcept override { return "You Lose"; }
 };
+
+//* 写个模板，有助于简单比较
+template <class T>
+inline T max(T x, T y)
+{
+    return (x > y) ? x : y;
+}
+
+template <class T>
+inline T min(T x, T y)
+{
+    return (x < y) ? x : y;
+}
 
 #endif // INFECTED_H

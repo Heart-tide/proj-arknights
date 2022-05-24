@@ -1,11 +1,11 @@
 #include "reunion.h"
 #include <cmath>
 
-Reunion::Reunion(size_t health, int damage, size_t interval,
+Reunion::Reunion(size_t health, int damage, int defense, size_t interval,
     size_t deployment_time, float move_speed,
     size_t id, QVector<Place*> route, QWidget* parent,
     QMovie* idle_movie, QMovie* attack_movie)
-    : Infected(health, damage, interval, route.back(),
+    : Infected(health, damage, defense, interval, route.back(),
         deployment_time, id, parent, idle_movie, attack_movie)
     , _move_speed(move_speed)
     , _route(route)
@@ -138,6 +138,7 @@ void Reunion::chooseDirection()
 
 GroundReunion::GroundReunion(size_t health,
     int damage,
+    int defense,
     size_t interval,
     size_t deployment_time,
     float move_speed,
@@ -146,7 +147,7 @@ GroundReunion::GroundReunion(size_t health,
     QWidget* parent,
     QMovie* idle_movie,
     QMovie* attack_movie)
-    : Reunion(health, damage, interval, deployment_time, move_speed, id, route, parent, idle_movie, attack_movie)
+    : Reunion(health, damage, defense, interval, deployment_time, move_speed, id, route, parent, idle_movie, attack_movie)
 {
 }
 
@@ -184,6 +185,7 @@ void GroundReunion::paintEvent(QPaintEvent* event)
 
 UAV::UAV(size_t health,
     int damage,
+    int defense,
     size_t interval,
     size_t deployment_time,
     float move_speed,
@@ -192,7 +194,7 @@ UAV::UAV(size_t health,
     QWidget* parent,
     QMovie* idle_movie,
     QMovie* attack_movie)
-    : Reunion(health, damage, interval, deployment_time, move_speed, id, route, parent, idle_movie, attack_movie)
+    : Reunion(health, damage, defense, interval, deployment_time, move_speed, id, route, parent, idle_movie, attack_movie)
 {
 }
 
@@ -227,21 +229,21 @@ void UAV::paintEvent(QPaintEvent* event)
 }
 
 Yuan::Yuan(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(40, 5, 35, deployment_time, 2, id, route, parent,
+    : GroundReunion(55, 13, 0, 85, deployment_time, 2, id, route, parent,
         new QMovie("://res/reunion/yuan-idle.gif"),
         new QMovie("://res/reunion/yuan-attack.gif")) //* 源石虫攻击力限时 UP 已结束 !
 {
 }
 
 Soldier::Soldier(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(60, 7, 40, deployment_time, 2.3, id, route, parent,
+    : GroundReunion(140, 24, 10, 120, deployment_time, 1.8, id, route, parent,
         new QMovie("://res/reunion/soldier-idle.gif"),
         new QMovie("://res/reunion/soldier-attack.gif"))
 {
 }
 
 Revenger::Revenger(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(120, 20, 70, deployment_time, 1.5, id, route, parent,
+    : GroundReunion(500, 30, 20, 115, deployment_time, 1.3, id, route, parent,
         new QMovie("://res/reunion/revenger-idle.gif"),
         new QMovie("://res/reunion/revenger-attack.gif"))
     , _low_health(false)
@@ -258,7 +260,7 @@ void Revenger::attack(Infected* op)
 }
 
 Monster::Monster(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : UAV(25, 3, 50, deployment_time, 3, id, route, parent,
+    : UAV(155, 22, 5, 150, deployment_time, 1.8, id, route, parent,
         new QMovie("://res/reunion/monster-idle.gif"),
         new QMovie("://res/reunion/monster-attack.gif"))
 {

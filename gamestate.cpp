@@ -177,6 +177,10 @@ void GameState::findAttackPlaces(Operator* op) const
 //* 生成 Reunion
 void GameState::reunionStragegy()
 {
+    //* 前 7s 不出怪
+    if (_time < 350) {
+        return;
+    }
     //* 若无任何路径，则进入地图编辑器模式，不出怪
     if ((_map->_routes[false].empty()) && (_map->_routes[true].empty())) {
         return;

@@ -14,12 +14,13 @@ class Operator : public Infected {
     Q_OBJECT
 
 public:
-    Operator(size_t health, int damage, size_t interval,
+    Operator(size_t health, int damage, int defense, size_t interval,
         Place* place, size_t deployment_time, size_t id,
         QWidget* parent, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
 
     void action(size_t time);
+    void attack(Infected* attacked) override;
 
     void addTo(Place* place) override;
     void removeFrom() override;
@@ -47,14 +48,14 @@ class Sniper : public Operator {
     Q_OBJECT
 
 public:
-    Sniper(size_t health, int damage, size_t interval,
+    Sniper(size_t health, int damage, int defense, size_t interval,
         HigherPlace* higher_place, size_t deployment_time,
         size_t id, QWidget* parent, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
 
     QString giveName() const override { return "Sniper"; }
     bool isGroundToAir() const override { return true; }
-    QPair<int, int> giveAttackArea() const override { return QPair<int, int>(3, 3); }
+    QPair<int, int> giveAttackArea() const override { return QPair<int, int>(3, 4); }
 };
 
 class Kroos : public Sniper {
@@ -68,7 +69,7 @@ public:
     QString giveName() const override { return "Kroos"; }
 
     //* 将 cost 设计成静态成员，以便在不创建对象的前提下，直接用类名进行引用
-    static constexpr size_t cost = 5;
+    static constexpr size_t cost = 14;
 };
 
 //************* 近卫 *************
@@ -76,7 +77,7 @@ class Guard : public Operator {
     Q_OBJECT
 
 public:
-    Guard(size_t health, int damage, size_t interval,
+    Guard(size_t health, int damage, int defense, size_t interval,
         LowerPlace* lower_place, size_t deployment_time,
         size_t id, QWidget* parent, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
@@ -92,11 +93,13 @@ public:
     Irene(LowerPlace* lower_place, size_t deployment_time,
         size_t id, QWidget* parent, Orientation orientation);
 
+    void attack(Infected* attacked) override;
+
     size_t giveCost() const override { return cost; }
     QString giveName() const override { return "Irene"; }
     size_t giveBlock() const override { return block; }
 
-    static constexpr size_t cost = 4;
+    static constexpr size_t cost = 23;
     static constexpr size_t block = 2;
 };
 
@@ -105,7 +108,7 @@ class Doctor : public Operator {
     Q_OBJECT
 
 public:
-    Doctor(size_t health, int damage, size_t interval,
+    Doctor(size_t health, int damage, int defense, size_t interval,
         HigherPlace* higher_place, size_t deployment_time,
         size_t id, QWidget* parent, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
@@ -126,7 +129,7 @@ public:
     size_t giveCost() const override { return cost; }
     QString giveName() const override { return "HoneyBerry"; }
 
-    static constexpr size_t cost = 5;
+    static constexpr size_t cost = 15;
 };
 
 #endif // OPERATOR_H

@@ -3,6 +3,7 @@
 
 Operator::Operator(size_t health,
     int damage,
+    int defense,
     size_t interval,
     Place* place,
     size_t deployment_time,
@@ -11,7 +12,7 @@ Operator::Operator(size_t health,
     Orientation orientation,
     QMovie* idle_movie,
     QMovie* attack_movie)
-    : Infected(health, damage, interval, place,
+    : Infected(health, damage, defense, interval, place,
         deployment_time, id, parent, idle_movie, attack_movie)
     , _orientation(orientation)
 {
@@ -30,8 +31,7 @@ void Operator::action(size_t time)
         _is_attacking = true;
         _last_action_time = time;
         auto attacked_place = attacked->givePlace();
-        //* 类的函数不一定都是成员函数，定义在类外有时不失为一种选择
-        attacked->reduceHealth(_damage);
+        attack(attacked);
         if (!attacked->isActive()) {
             // C++ 11 的 Raw String Literals，有助于更方便地书写字符串字面量：R"(……)"，中间可加换行
             printLog("#ee0000", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(attacked->giveName()).arg(attacked_place->giveID()));
@@ -40,6 +40,12 @@ void Operator::action(size_t time)
     } else {
         _is_attacking = false;
     }
+}
+
+void Operator::attack(Infected* attacked)
+{
+    //* 类的函数不一定都是成员函数，定义在类外有时不失为一种选择
+    attacked->reduceHealth(_damage);
 }
 
 void Operator::addTo(Place* place)
@@ -111,6 +117,7 @@ void Operator::paintEvent(QPaintEvent*)
 
 Sniper::Sniper(size_t health,
     int damage,
+    int defense,
     size_t interval,
     HigherPlace* higher_place,
     size_t deployment_time,
@@ -119,7 +126,7 @@ Sniper::Sniper(size_t health,
     Orientation orientation,
     QMovie* idle_movie,
     QMovie* attack_movie)
-    : Operator(health, damage, interval, higher_place, deployment_time,
+    : Operator(health, damage, defense, interval, higher_place, deployment_time,
         id, parent, orientation, idle_movie, attack_movie)
 {
     setGeometry(_place->x() - 5, _place->y() - 8, 100, 100);
@@ -127,6 +134,7 @@ Sniper::Sniper(size_t health,
 
 Guard::Guard(size_t health,
     int damage,
+    int defense,
     size_t interval,
     LowerPlace* lower_place,
     size_t deployment_time,
@@ -135,17 +143,24 @@ Guard::Guard(size_t health,
     Orientation orientation,
     QMovie* idle_movie,
     QMovie* attack_movie)
-    : Operator(health, damage, interval, lower_place, deployment_time,
+    : Operator(health, damage, defense, interval, lower_place, deployment_time,
         id, parent, orientation, idle_movie, attack_movie)
 {
     setGeometry(_place->x() - 15, _place->y(), 100, 100);
 }
 
-Doctor::Doctor(size_t health, int damage, size_t interval,
-    HigherPlace* higher_place, size_t deployment_time,
-    size_t id, QWidget* parent, Orientation orientation,
-    QMovie* idle_movie, QMovie* attack_movie)
-    : Operator(health, damage, interval, higher_place, deployment_time,
+Doctor::Doctor(size_t health,
+    int damage,
+    int defense,
+    size_t interval,
+    HigherPlace* higher_place,
+    size_t deployment_time,
+    size_t id,
+    QWidget* parent,
+    Orientation orientation,
+    QMovie* idle_movie,
+    QMovie* attack_movie)
+    : Operator(health, damage, defense, interval, higher_place, deployment_time,
         id, parent, orientation, idle_movie, attack_movie)
 {
     setGeometry(_place->x() - 5, _place->y() - 8, 100, 100);
@@ -156,7 +171,7 @@ Infected* Doctor::findAttacked() const
     QVector<Infected*> injured_operators;
     for (auto place = _attack_places.cbegin(); place < _attack_places.cend(); place++) {
         Infected* op = (*place)->giveOperator();
-        if (op != nullptr && op->healthReduced()) {
+        if (op != nullptr && op->isHealthReduced()) {
             injured_operators.push_back(op);
         }
     }
@@ -165,7 +180,7 @@ Infected* Doctor::findAttacked() const
 
 HoneyBerry::HoneyBerry(HigherPlace* higher_place, size_t deployment_time,
     size_t id, QWidget* parent, Orientation orientation)
-    : Doctor(30, -10, 30, higher_place, deployment_time, id, parent, orientation,
+    : Doctor(125, -30, 9, 95, higher_place, deployment_time, id, parent, orientation,
         new QMovie("://res/operator/HoneyBerry-idle.gif"),
         new QMovie("://res/operator/HoneyBerry-attack.gif"))
 {
@@ -176,10 +191,18 @@ Irene::Irene(LowerPlace* lower_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Guard(70, 10, 30, lower_place, deployment_time, id, parent, orientation,
+    : Guard(220, 48, 28, 65, lower_place, deployment_time, id, parent, orientation,
         new QMovie("://res/operator/Irene-idle.gif"),
         new QMovie("://res/operator/Irene-attack.gif"))
 {
+}
+
+void Irene::attack(Infected* attacked)
+{
+    attacked->reduceHealth(_damage);
+    if (attacked->isActive()) {
+        attacked->reduceHealth(_damage);
+    }
 }
 
 Kroos::Kroos(HigherPlace* higher_place,
@@ -187,7 +210,7 @@ Kroos::Kroos(HigherPlace* higher_place,
     size_t id,
     QWidget* parent,
     Orientation orientation)
-    : Sniper(30, 6, 20, higher_place, deployment_time, id, parent, orientation,
+    : Sniper(125, 41, 15, 50, higher_place, deployment_time, id, parent, orientation,
         new QMovie("://res/operator/Kroos-idle.gif"),
         new QMovie("://res/operator/Kroos-attack.gif"))
 {

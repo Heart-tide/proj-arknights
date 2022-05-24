@@ -10,14 +10,14 @@ class Reunion : public Infected {
     Q_OBJECT
 
 public:
-    Reunion(size_t health, int damage, size_t interval,
+    Reunion(size_t health, int damage, int defense, size_t interval,
         size_t deployment_time, float move_speed,
         size_t id, QVector<Place*> route, QWidget* parent,
         QMovie* idle_movie, QMovie* attack_movie);
 
     virtual void action(size_t time, size_t& hp, Infected* op, Map* map) = 0;
     void move(size_t& hp, Map* map);
-    virtual void attack(Infected* op);
+    virtual void attack(Infected* op) override;
 
     void addTo(Place* place) override;
     void removeFrom() override;
@@ -46,7 +46,7 @@ class GroundReunion : public Reunion {
     Q_OBJECT
 
 public:
-    GroundReunion(size_t health, int damage, size_t interval,
+    GroundReunion(size_t health, int damage, int defense, size_t interval,
         size_t deployment_time, float move_speed,
         size_t id, QVector<Place*> route, QWidget* parent,
         QMovie* idle_movie, QMovie* attack_movie);
@@ -97,7 +97,7 @@ class UAV : public Reunion {
     Q_OBJECT
 
 public:
-    UAV(size_t health, int damage, size_t interval, size_t deployment_time,
+    UAV(size_t health, int damage, int defense, size_t interval, size_t deployment_time,
         float move_speed, size_t id, QVector<Place*> route, QWidget* parent,
         QMovie* idle_movie, QMovie* attack_movie);
 

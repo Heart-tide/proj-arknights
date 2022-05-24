@@ -1,13 +1,14 @@
 #include "infected.h"
 #include <ctime>
 
-Infected::Infected(size_t health, int damage, size_t interval,
+Infected::Infected(size_t health, int damage, int defense, size_t interval,
     Place* place, size_t deployment_time, size_t id, QWidget* parent,
     QMovie* idle_movie, QMovie* attack_movie)
     : QWidget(parent)
     , _health(health)
     , _max_health(health)
     , _damage(damage)
+    , _defense(defense)
     , _interval(interval)
     , _last_action_time(deployment_time)
     , _place(place)
@@ -26,7 +27,7 @@ Infected::Infected(size_t health, int damage, size_t interval,
 
 void Infected::reduceHealth(int damage)
 {
-    _health -= damage;
+    _health -= max<double>(0.1 * damage, damage - _defense);
     if (_health > _max_health) {
         _health = _max_health;
     } else if (_health <= 0) {
