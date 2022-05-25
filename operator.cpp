@@ -30,11 +30,11 @@ void Operator::action(size_t time)
     if (attacked) { //* 暂时无视阻挡数要求
         _is_attacking = true;
         _last_action_time = time;
-        auto attacked_place = attacked->givePlace();
+        // auto attacked_place = attacked->getPlace();
         attack(attacked);
         if (!attacked->isActive()) {
             // C++ 11 的 Raw String Literals，有助于更方便地书写字符串字面量：R"(……)"，中间可加换行
-            // printLog("#ee0000", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(attacked->giveName()).arg(attacked_place->giveID()));
+            // printLog("#ee0000", "KILL", QString("%1%2 --> %3%4").arg(getName()).arg(_place->getID()).arg(attacked->getName()).arg(attacked_place->getID()));
             attacked->hide();
         }
     } else {
@@ -66,7 +66,7 @@ Infected* Operator::findAttacked() const
 {
     bool is_ground_to_air = isGroundToAir();
     for (auto place = _attack_places.cbegin(); place < _attack_places.cend(); place++) {
-        for (auto reunion = (*place)->giveReunions().cbegin(); reunion < (*place)->giveReunions().cend(); reunion++) {
+        for (auto reunion = (*place)->getReunions().cbegin(); reunion < (*place)->getReunions().cend(); reunion++) {
             //* 要不我方干员是可对空的，要不敌方是地面单位
             if (is_ground_to_air || (dynamic_cast<Reunion*>(*reunion)->isFlying() == false)) {
                 return (*reunion);
@@ -116,10 +116,10 @@ void Operator::paintEvent(QPaintEvent*)
 }
 
 //* 展示我方干员的状态
-void Operator::mousePressEvent(QMouseEvent* event)
+void Operator::mousePressEvent(QMouseEvent*)
 {
-    printLog("#cc9900", QString("%0").arg(giveName()), QString("{HP}%1 {ATT}%2 {DEF}%3").arg(_health).arg(_damage).arg(_defense));
-    printLog("#ffffff", QString("%0").arg(giveName()), QString("{ATTSPD}%1 {BLK}%2").arg(0.02 * _interval).arg(giveBlock()));
+    printLog("#cc9900", QString("%0").arg(getName()), QString("{HP}%1 {ATT}%2 {DEF}%3").arg(_health).arg(_damage).arg(_defense));
+    printLog("#ffffff", QString("%0").arg(getName()), QString("{ATTSPD}%1 {BLK}%2").arg(0.02 * _interval).arg(getBlock()));
 }
 
 Sniper::Sniper(size_t health,
@@ -177,12 +177,12 @@ Infected* Doctor::findAttacked() const
 {
     QVector<Infected*> injured_operators;
     for (auto place = _attack_places.cbegin(); place < _attack_places.cend(); place++) {
-        Infected* op = (*place)->giveOperator();
+        Infected* op = (*place)->getOperator();
         if (op != nullptr && op->isHealthReduced()) {
             injured_operators.push_back(op);
         }
     }
-    return injured_operators.empty() ? nullptr : giveRandomUnit(injured_operators); //* 注意不能除零
+    return injured_operators.empty() ? nullptr : getRandomUnit(injured_operators); //* 注意不能除零
 }
 
 void Doctor::attack(Infected* attacked)

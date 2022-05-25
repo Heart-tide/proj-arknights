@@ -1,8 +1,6 @@
 #include "gamestate.h"
 #include "ui_map.h"
 #include <QDialog>
-#include <QString>
-#include <ctime>
 
 using std::function;
 
@@ -89,7 +87,7 @@ void GameState::update()
 //* 部署一个 Operator 对象
 void GameState::deployOperator(size_t choice, Place* place, Orientation orientation)
 {
-    if (place->giveOperator() != nullptr) //* 一个格子最多只能有一个干员
+    if (place->getOperator() != nullptr) //* 一个格子最多只能有一个干员
         return;
     Operator* op = nullptr;
     static size_t id_counter = 0;
@@ -115,59 +113,57 @@ void GameState::deployOperator(size_t choice, Place* place, Orientation orientat
     }
     // _map->_operatorSelected = -1; //* 永远不清空干员预置栏
     findAttackPlaces(op); //* 设置该干员的攻击范围
-    _dp -= op->giveCost();
+    _dp -= op->getCost();
     _active_operators.push_back(op);
-    printLog("#33cccc", "DEPLOY", QString("%1 %2").arg(op->giveName()).arg(op->givePlace()->giveID()));
+    printLog("#33cccc", "DEPLOY", QString("%1 %2").arg(op->getName()).arg(op->getPlace()->getID()));
 }
 
 //* 场上所有 active 的 operator 按其生成次序行动
 void GameState::operatorAction()
 {
-    QVector<Operator*> still_active;
     for (auto it = _active_operators.begin(); it < _active_operators.end(); it++) {
         if ((*it)->isActive()) {
             (*it)->action(_time);
-            still_active.push_back(*it);
         } else {
             delete (*it);
+            _active_operators.erase(it);
         }
     }
-    _active_operators = still_active;
 }
 
 //* 计算干员可攻击到的敌人
 void GameState::findAttackPlaces(Operator* op) const
 {
     int x = 0, y = 0, height = 0, width = 0;
-    switch (op->giveOrientation()) {
+    switch (op->getOrientation()) {
     case UP:
-        height = op->giveAttackArea().second;
-        width = op->giveAttackArea().first;
-        x = op->givePlace()->showID().second - width / 2;
-        y = op->givePlace()->showID().first - (height - 1);
+        height = op->getAttackArea().second;
+        width = op->getAttackArea().first;
+        x = op->getPlace()->showID().second - width / 2;
+        y = op->getPlace()->showID().first - (height - 1);
         break;
     case DOWN:
-        height = op->giveAttackArea().second;
-        width = op->giveAttackArea().first;
-        x = op->givePlace()->showID().second - width / 2;
-        y = op->givePlace()->showID().first;
+        height = op->getAttackArea().second;
+        width = op->getAttackArea().first;
+        x = op->getPlace()->showID().second - width / 2;
+        y = op->getPlace()->showID().first;
         break;
     case LEFT:
-        height = op->giveAttackArea().first;
-        width = op->giveAttackArea().second;
-        x = op->givePlace()->showID().second - (width - 1);
-        y = op->givePlace()->showID().first - height / 2;
+        height = op->getAttackArea().first;
+        width = op->getAttackArea().second;
+        x = op->getPlace()->showID().second - (width - 1);
+        y = op->getPlace()->showID().first - height / 2;
         break;
     case RIGHT:
-        height = op->giveAttackArea().first;
-        width = op->giveAttackArea().second;
-        x = op->givePlace()->showID().second;
-        y = op->givePlace()->showID().first - height / 2;
+        height = op->getAttackArea().first;
+        width = op->getAttackArea().second;
+        x = op->getPlace()->showID().second;
+        y = op->getPlace()->showID().first - height / 2;
         break;
     }
     QVector<Place*> attack_area;
-    for (int i = max(x, 0); i < min<int>(x + width, _map->giveWidth()); i++) {
-        for (int j = max(y, 0); j < min<int>(y + height, _map->giveHeight()); j++) {
+    for (int i = max(x, 0); i < min<int>(x + width, _map->getWidth()); i++) {
+        for (int j = max(y, 0); j < min<int>(y + height, _map->getHeight()); j++) {
             attack_area.push_back((*_map)[j][i]);
         }
     }
@@ -190,7 +186,7 @@ void GameState::reunionStragegy()
     _enemy_stats--;
     auto reunion = createRandomReunion();
     _active_reunions.push_back(reunion);
-    // printLog(QString("CREATE %1 # %2").arg(reunion->giveName()).arg(reunion->giveID()));
+    // printLog(QString("CREATE %1 # %2").arg(reunion->getName()).arg(reunion->getID()));
 }
 
 //* 随机生成一个 Reunion 的对象，可以给不同类型以不同的生成概率
@@ -208,17 +204,17 @@ Reunion* GameState::createRandomReunion()
     case 0:
     case 1:
     case 2:
-        return new Yuan(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
+        return new Yuan(_time, id_counter++, getRandomUnit(_map->_routes[false]), this);
     case 3:
     case 4:
-        return new Soldier(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
+        return new Soldier(_time, id_counter++, getRandomUnit(_map->_routes[false]), this);
     case 5:
     case 6:
-        return new Revenger(_time, id_counter++, giveRandomUnit(_map->_routes[false]), this);
+        return new Revenger(_time, id_counter++, getRandomUnit(_map->_routes[false]), this);
     case 7:
     case 8:
     case 9:
-        return new Monster(_time, id_counter++, giveRandomUnit(_map->_routes[true]), this);
+        return new Monster(_time, id_counter++, getRandomUnit(_map->_routes[true]), this);
     default:
         return nullptr;
     }
@@ -227,17 +223,15 @@ Reunion* GameState::createRandomReunion()
 //* 场上所有 active 的 Reunion 按其生成次序行动
 void GameState::reunionAction()
 {
-    QVector<Reunion*> still_active;
     for (auto it = _active_reunions.begin(); it < _active_reunions.end(); it++) {
         if ((*it)->isActive()) {
             (*it)->action(_time, _hp, properAttackedOperator(*it), _map);
-            still_active.push_back(*it);
         } else {
             delete (*it);
+            _active_reunions.erase(it);
         }
     }
-    _active_reunions = still_active;
-    if (still_active.empty() && _enemy_stats == 0) {
+    if (_active_reunions.empty() && _enemy_stats == 0) {
         throw WinGameException();
     }
 }
@@ -245,15 +239,14 @@ void GameState::reunionAction()
 //* 计算整合运动可攻击到的干员
 Infected* GameState::properAttackedOperator(Reunion* reunion) const
 {
-    bool is_flying = reunion->isFlying();
-    int x = reunion->givePlace()->showID().second - reunion->giveAttackArea();
-    int y = reunion->givePlace()->showID().first - reunion->giveAttackArea();
-    int a = 2 * reunion->giveAttackArea() + 1;
-    for (int i = max(x, 0); i < min<int>(x + a, _map->giveWidth()); i++) {
-        for (int j = max(y, 0); j < min<int>(y + a, _map->giveHeight()); j++) {
+    int x = reunion->getPlace()->showID().second - reunion->getAttackArea();
+    int y = reunion->getPlace()->showID().first - reunion->getAttackArea();
+    int a = 2 * reunion->getAttackArea() + 1;
+    for (int i = max(x, 0); i < min<int>(x + a, _map->getWidth()); i++) {
+        for (int j = max(y, 0); j < min<int>(y + a, _map->getHeight()); j++) {
             //* 暂时不做敌人的远程单位近战单位的区分，仅按攻击范围来看
-            if ((*_map)[j][i]->giveOperator()) {
-                return (*_map)[j][i]->giveOperator();
+            if ((*_map)[j][i]->getOperator()) {
+                return (*_map)[j][i]->getOperator();
             }
         }
     }

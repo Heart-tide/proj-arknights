@@ -62,10 +62,10 @@ void Reunion::move(size_t& hp, Map* map)
 //* 攻击！
 void Reunion::attack(Infected* op)
 {
-    auto op_place = op->givePlace(); //* 提前保存干员所在地块，不然一会受击死亡后就找不到了
+    // auto op_place = op->getPlace(); //* 提前保存干员所在地块，不然一会受击死亡后就找不到了
     op->reduceHealth(_damage);
     if (!op->isActive()) {
-        // printLog("#ff9933", "KILL", QString("%1%2 --> %3%4").arg(giveName()).arg(_place->giveID()).arg(op->giveName()).arg(op_place->giveID()));
+        // printLog("#ff9933", "KILL", QString("%1%2 --> %3%4").arg(getName()).arg(_place->getID()).arg(op->getName()).arg(op_place->getID()));
         op->hide();
     }
 }
@@ -98,8 +98,8 @@ void Reunion::paintEvent(QPaintEvent*)
 //* 将对整合运动的鼠标点击传递给其所在的地面
 void Reunion::mousePressEvent(QMouseEvent* event)
 {
-    printLog("#cc9900", QString("%0").arg(giveName()), QString("{HP}%1 {ATT}%2 {DEF}%3").arg(_health).arg(_damage).arg(_defense));
-    printLog("#ffffff", QString("%0").arg(giveName()), QString("{ATTSPD}%1 {MOVSPD}%2").arg(0.02 * _interval).arg(_move_speed));
+    printLog("#cc9900", QString("%0").arg(getName()), QString("{HP}%1 {ATT}%2 {DEF}%3").arg(_health).arg(_damage).arg(_defense));
+    printLog("#ffffff", QString("%0").arg(getName()), QString("{ATTSPD}%1 {MOVSPD}%2").arg(0.02 * _interval).arg(_move_speed));
     return _place->mousePressEvent(event);
 }
 
@@ -157,7 +157,7 @@ void GroundReunion::action(size_t time, size_t& hp, Infected* op, Map* map)
 {
     //? 220428 因将==误写作=，在此debug半个钟头
     //* 干员会对阻挡最后所接敌人进行阻挡
-    if (op && op->giveBlock() >= op->givePlace()->giveReunions().size()) {
+    if (op && op->getBlock() >= op->getPlace()->getReunions().size()) {
         _is_attacking = true;
         if (time - _last_action_time < _interval)
             return;

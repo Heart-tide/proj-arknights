@@ -3,8 +3,6 @@
 
 #include "infected.h"
 #include <QVector2D>
-#include <QVector>
-#include <QWidget>
 
 class Reunion : public Infected {
     Q_OBJECT
@@ -23,9 +21,9 @@ public:
     void removeFrom() override;
 
     virtual bool isFlying() { return false; }
-    QString giveName() const override { return "Reunion"; }
+    QString getName() const override { return "Reunion"; }
     //* 整合运动的攻击范围是一个正方形，其边长为该函数返回值的 2 倍加 1
-    virtual int giveAttackArea() const = 0;
+    virtual int getAttackArea() const = 0;
 
     void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* event) override;
@@ -52,7 +50,7 @@ public:
         QMovie* idle_movie, QMovie* attack_movie);
 
     void action(size_t time, size_t& hp, Infected* op, Map* map) override;
-    QString giveName() const override { return "GroundReunion"; }
+    QString getName() const override { return "GroundReunion"; }
 
     void paintEvent(QPaintEvent*) override;
 };
@@ -63,8 +61,8 @@ class Yuan : public GroundReunion {
 public:
     Yuan(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent);
 
-    QString giveName() const override { return "Yuan"; }
-    int giveAttackArea() const override { return 0; }
+    QString getName() const override { return "Yuan"; }
+    int getAttackArea() const override { return 0; }
 };
 
 class Soldier : public GroundReunion {
@@ -73,8 +71,8 @@ class Soldier : public GroundReunion {
 public:
     Soldier(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent);
 
-    QString giveName() const override { return "Soldier"; }
-    int giveAttackArea() const override { return 1; }
+    QString getName() const override { return "Soldier"; }
+    int getAttackArea() const override { return 1; }
 };
 
 class Revenger : public GroundReunion {
@@ -83,8 +81,8 @@ class Revenger : public GroundReunion {
 public:
     Revenger(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent);
 
-    QString giveName() const override { return "Revenger"; }
-    int giveAttackArea() const override { return 0; }
+    QString getName() const override { return "Revenger"; }
+    int getAttackArea() const override { return 0; }
 
     void attack(Infected* op) override;
 
@@ -103,7 +101,7 @@ public:
 
     void action(size_t time, size_t& hp, Infected* op, Map* map) override;
     bool isFlying() override { return true; }
-    QString giveName() const override { return "UAV"; }
+    QString getName() const override { return "UAV"; }
 
     void paintEvent(QPaintEvent*) override;
 };
@@ -114,8 +112,8 @@ class Monster : public UAV {
 public:
     Monster(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent);
 
-    QString giveName() const override { return "Monster"; }
-    int giveAttackArea() const override { return 1; }
+    QString getName() const override { return "Monster"; }
+    int getAttackArea() const override { return 1; }
 };
 
 #endif // REUNION_H

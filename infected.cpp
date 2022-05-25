@@ -1,5 +1,4 @@
 #include "infected.h"
-#include <ctime>
 
 Infected::Infected(size_t health, int damage, int defense, size_t interval,
     Place* place, size_t deployment_time, size_t id, QWidget* parent,

@@ -1,9 +1,9 @@
 #ifndef PLACE_H
 #define PLACE_H
 
+#include "commondef.h"
 #include <QPair>
 #include <QPoint>
-#include <QString>
 #include <QVector>
 #include <QWidget>
 
@@ -33,9 +33,9 @@ public:
     virtual bool isLower() { return false; }
     virtual bool isHigher() { return false; }
 
-    Infected* giveOperator() { return _op; }
-    QVector<Infected*>& giveReunions() { return _reunions; }
-    QString giveID() const; //* 返回 QString 数据
+    Infected* getOperator() { return _op; }
+    QVector<Infected*>& getReunions() { return _reunions; }
+    QString getID() const; //* 返回 QString 数据
     QPair<size_t, size_t> showID() const { return _id; } //* 返回 id 本身
 
     void mousePressEvent(QMouseEvent* event) override;
@@ -102,13 +102,5 @@ public:
     HigherPlace(GameState* gamestate, QWidget* parent);
     bool isHigher() override { return true; }
 };
-
-//* 给出任意单位，用于整合运动的初始入口确定
-template <class T>
-T giveRandomUnit(QVector<T>& units)
-{
-    srand(static_cast<unsigned>(clock()));
-    return units[rand() % units.size()];
-}
 
 #endif // PLACE_H

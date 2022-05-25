@@ -1,12 +1,10 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-#include "infected.h"
-#include "map.h"
 #include "operator.h"
 #include "reunion.h"
+#include <QList>
 #include <QTimer>
-#include <QWidget>
 
 //* GameState 类，管理整个游戏系统
 class GameState : public QWidget {
@@ -32,8 +30,8 @@ public:
 private:
     Map* _map;
     QTimer* _timer;
-    QVector<Operator*> _active_operators;
-    QVector<Reunion*> _active_reunions;
+    QList<Operator*> _active_operators;
+    QList<Reunion*> _active_reunions;
 
     size_t _enemy_stats; //* 剩余敌人个数
     size_t _create_interval;

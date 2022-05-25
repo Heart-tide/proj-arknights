@@ -3,7 +3,6 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPixmap>
-#include <QString>
 
 extern void deployOperator(GameState* gamestate, Place* place, int orientation);
 
@@ -51,7 +50,7 @@ HigherPlace::HigherPlace(GameState* gamestate, QWidget* parent)
 {
 }
 
-QString Place::giveID() const
+QString Place::getID() const
 {
     return "[" + QString::number(_id.second)
         + "," + QString::number(_id.first) + "]";

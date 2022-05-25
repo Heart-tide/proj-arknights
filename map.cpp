@@ -4,7 +4,6 @@
 #include <QFile>
 #include <QMouseEvent>
 #include <QPainter>
-#include <ctime>
 
 Map::Map(GameState* gamestate, QWidget* parent)
     : QWidget(parent)
@@ -16,7 +15,7 @@ Map::Map(GameState* gamestate, QWidget* parent)
     connectOperators();
     loadMap();
     arrangeUiWidgets();
-    printLog("#000000", "", QString("地图生成成功, 大小 %1 * %2").arg(giveHeight()).arg(giveWidth()));
+    printLog("#000000", "", QString("地图生成成功, 大小 %1 * %2").arg(getHeight()).arg(getWidth()));
     printLog("#000000", "", "游戏开始了哦!");
 }
 
@@ -44,8 +43,8 @@ void Map::connectOperators()
 //* 让窗口部件大小自适应地图大小
 void Map::arrangeUiWidgets()
 {
-    auto width = giveWidth();
-    auto height = giveHeight();
+    auto width = getWidth();
+    auto height = getHeight();
     //* 1. log, speed and pause
     ui->text_log->setGeometry(10, height * 100 + 10, 320, 80);
     ui->push_speed->setGeometry(width * 100 - 70, 20, 40, 40);
@@ -173,8 +172,8 @@ void Map::paintEvent(QPaintEvent*)
     QPixmap lower_place("://res/place/lower-1.png");
     QPixmap base("://res/place/base.png");
     QPixmap entrance("://res/place/entrance.png");
-    for (size_t i = 0; i < giveHeight(); i++) {
-        for (size_t j = 0; j < giveWidth(); j++) {
+    for (size_t i = 0; i < getHeight(); i++) {
+        for (size_t j = 0; j < getWidth(); j++) {
             Place* place = (*this)[i][j];
             if (place->isBase()) {
                 painter.drawPixmap(place->x(), place->y(), place->height(), place->width(), common_place);
@@ -192,7 +191,7 @@ void Map::paintEvent(QPaintEvent*)
         }
     }
     //* 多画一行干员预备栏的底色
-    for (size_t j = 0; j < giveWidth(); j++) {
-        painter.drawPixmap(j * 100, giveHeight() * 100, 100, 100, common_place);
+    for (size_t j = 0; j < getWidth(); j++) {
+        painter.drawPixmap(j * 100, getHeight() * 100, 100, 100, common_place);
     }
 }

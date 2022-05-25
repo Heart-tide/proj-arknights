@@ -2,8 +2,6 @@
 #define OPERATOR_H
 
 #include "infected.h"
-#include <QPair>
-#include <QWidget>
 
 enum Orientation { UP,
     DOWN,
@@ -25,11 +23,11 @@ public:
     void addTo(Place* place) override;
     void removeFrom() override;
 
-    virtual size_t giveCost() const = 0;
-    QString giveName() const override { return "Operator"; }
-    Orientation giveOrientation() const { return _orientation; }
+    virtual size_t getCost() const = 0;
+    QString getName() const override { return "Operator"; }
+    Orientation getOrientation() const { return _orientation; }
     //* 假设向右部署，干员的矩形攻击范围的 height, width 大小
-    virtual QPair<int, int> giveAttackArea() const { return QPair<int, int>(1, 1); }
+    virtual QPair<int, int> getAttackArea() const { return QPair<int, int>(1, 1); }
 
     virtual bool isGroundToAir() const { return false; }
 
@@ -37,7 +35,7 @@ public:
     virtual Infected* findAttacked() const;
 
     void paintEvent(QPaintEvent*) override;
-    void mousePressEvent(QMouseEvent* event) override;
+    void mousePressEvent(QMouseEvent*) override;
 
 protected:
     Orientation _orientation;
@@ -54,9 +52,9 @@ public:
         size_t id, QWidget* parent, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
 
-    QString giveName() const override { return "Sniper"; }
+    QString getName() const override { return "Sniper"; }
     bool isGroundToAir() const override { return true; }
-    QPair<int, int> giveAttackArea() const override { return QPair<int, int>(3, 4); }
+    QPair<int, int> getAttackArea() const override { return QPair<int, int>(3, 4); }
 };
 
 class Kroos : public Sniper {
@@ -66,8 +64,8 @@ public:
     Kroos(HigherPlace* higher_place, size_t deployment_time,
         size_t id, QWidget* parent, Orientation orientation);
 
-    size_t giveCost() const override { return cost; }
-    QString giveName() const override { return "Kroos"; }
+    size_t getCost() const override { return cost; }
+    QString getName() const override { return "Kroos"; }
 
     //* 将 cost 设计成静态成员，以便在不创建对象的前提下，直接用类名进行引用
     static constexpr size_t cost = 14;
@@ -83,8 +81,8 @@ public:
         size_t id, QWidget* parent, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
 
-    QString giveName() const override { return "Guard"; }
-    QPair<int, int> giveAttackArea() const override { return QPair<int, int>(1, 2); }
+    QString getName() const override { return "Guard"; }
+    QPair<int, int> getAttackArea() const override { return QPair<int, int>(1, 2); }
 };
 
 class Irene : public Guard {
@@ -96,12 +94,11 @@ public:
 
     void attack(Infected* attacked) override;
 
-    size_t giveCost() const override { return cost; }
-    QString giveName() const override { return "Irene"; }
-    size_t giveBlock() const override { return block; }
+    size_t getCost() const override { return cost; }
+    QString getName() const override { return "Irene"; }
+    int getBlock() const override { return 2; }
 
     static constexpr size_t cost = 23;
-    static constexpr size_t block = 2;
 };
 
 //************* 医疗 *************
@@ -114,8 +111,8 @@ public:
         size_t id, QWidget* parent, Orientation orientation,
         QMovie* idle_movie, QMovie* attack_movie);
 
-    QString giveName() const override { return "Doctor"; }
-    QPair<int, int> giveAttackArea() const override { return QPair<int, int>(3, 4); }
+    QString getName() const override { return "Doctor"; }
+    QPair<int, int> getAttackArea() const override { return QPair<int, int>(3, 4); }
 
     Infected* findAttacked() const override;
     void attack(Infected* attacked) override;
@@ -128,9 +125,9 @@ public:
     HoneyBerry(HigherPlace* higher_place, size_t deployment_time,
         size_t id, QWidget* parent, Orientation orientation);
 
-    size_t giveCost() const override { return cost; }
-    QString giveName() const override { return "HoneyBerry"; }
-    QPair<int, int> giveAttackArea() const override { return QPair<int, int>(5, 4); }
+    size_t getCost() const override { return cost; }
+    QString getName() const override { return "HoneyBerry"; }
+    QPair<int, int> getAttackArea() const override { return QPair<int, int>(5, 4); }
 
     static constexpr size_t cost = 15;
 };
