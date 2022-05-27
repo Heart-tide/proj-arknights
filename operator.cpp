@@ -118,7 +118,8 @@ void Operator::paintEvent(QPaintEvent*)
 //* 展示我方干员的状态
 void Operator::mousePressEvent(QMouseEvent*)
 {
-    printLog("#cc9900", QString("%0").arg(getName()), QString("{HP}%1 {ATT}%2 {DEF}%3").arg(_health).arg(_damage).arg(_defense));
+    auto attackArea = getAttackArea();
+    printLog("#cc9900", QString("%0").arg(getName()), QString("{ATT}%1 {DEF}%2 {AREA}%3*%4").arg(_damage).arg(_defense).arg(attackArea.first).arg(attackArea.second));
     printLog("#ffffff", QString("%0").arg(getName()), QString("{ATTSPD}%1 {BLK}%2").arg(0.02 * _interval).arg(getBlock()));
 }
 

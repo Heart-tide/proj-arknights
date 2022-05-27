@@ -121,12 +121,14 @@ void GameState::deployOperator(size_t choice, Place* place, Orientation orientat
 //* 场上所有 active 的 operator 按其生成次序行动
 void GameState::operatorAction()
 {
-    for (auto it = _active_operators.begin(); it < _active_operators.end(); it++) {
+    //? 注意 list 的删除元素的方法
+    for (auto it = _active_operators.begin(); it != _active_operators.end();) {
         if ((*it)->isActive()) {
             (*it)->action(_time);
+            it++; //? 不删除元素时，正常递增迭代器
         } else {
             delete (*it);
-            _active_operators.erase(it);
+            it = _active_operators.erase(it); //? 删除元素后，指向它的迭代器失效，故将其指向下一个元素
         }
     }
 }
@@ -223,12 +225,13 @@ Reunion* GameState::createRandomReunion()
 //* 场上所有 active 的 Reunion 按其生成次序行动
 void GameState::reunionAction()
 {
-    for (auto it = _active_reunions.begin(); it < _active_reunions.end(); it++) {
+    for (auto it = _active_reunions.begin(); it != _active_reunions.end();) {
         if ((*it)->isActive()) {
             (*it)->action(_time, _hp, properAttackedOperator(*it), _map);
+            it++;
         } else {
             delete (*it);
-            _active_reunions.erase(it);
+            it = _active_reunions.erase(it);
         }
     }
     if (_active_reunions.empty() && _enemy_stats == 0) {
