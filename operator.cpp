@@ -92,7 +92,7 @@ void Operator::paintEvent(QPaintEvent*)
         image = _idle_movie->currentImage();
     }
     if (_is_attacked_count > 0) {
-        convertToRedImage(image);
+        convertToRedImage(image, _is_attacked_count);
         _is_attacked_count--;
     }
     painter.drawImage(QRect(-50, -70, 200, 200), image);

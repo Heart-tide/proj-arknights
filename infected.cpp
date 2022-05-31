@@ -36,10 +36,7 @@ void Infected::reduceHealth(int damage)
         delete _idle_movie;
         delete _attack_movie;
     }
-    //* 如果当次受到大量伤害，闪烁红色
-    if (true_damage > 0.1 * _max_health) {
-        _is_attacked_count = 15; //* 持续 300ms
-    }
+    _is_attacked_count = 10; //* 持续 200ms
 }
 
 void Infected::increaseHealth(int damage)
@@ -56,13 +53,14 @@ void Infected::timerEvent(QTimerEvent*)
 }
 
 //* 红色图片捏
-void Infected::convertToRedImage(QImage& img)
+void Infected::convertToRedImage(QImage& img, int degree)
 {
     //* 四通道 8bit-8bit-8bit-8bit 的 rgba 色彩模式，前三位分别表示 rgb，最后一位表示透明度
     //* 8bit 为每位的值域，每个像素点的四位在色彩空间数组中临近存储
     img = QImage(img).convertToFormat(QImage::Format_RGBA8888);
     uint8_t* rgb = img.bits();
     for (int i = 0; i < img.width() * img.height(); i++) {
-        rgb[i * 4] = 255; //* r=255，其他不变
+        int new_red_degree = rgb[i * 4] + (100 - 20 * abs(degree - 5)); //* 线性地增加至 100 个点，然后线性地衰退
+        rgb[i * 4] = new_red_degree > 255 ? 255 : new_red_degree;
     }
 }

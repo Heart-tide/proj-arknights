@@ -36,7 +36,7 @@ public:
     void timerEvent(QTimerEvent*) override;
 
 protected:
-    void convertToRedImage(QImage& img);
+    void convertToRedImage(QImage& img, int degree);
 
     int _health;
     const int _max_health;

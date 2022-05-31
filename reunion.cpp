@@ -184,7 +184,7 @@ void GroundReunion::paintEvent(QPaintEvent* event)
         image = _idle_movie->currentImage();
     }
     if (_is_attacked_count > 0) {
-        convertToRedImage(image);
+        convertToRedImage(image, _is_attacked_count);
         _is_attacked_count--;
     }
     painter.drawImage(QRect(-35, -70, 200, 200), image);
@@ -235,7 +235,7 @@ void UAV::paintEvent(QPaintEvent* event)
         image = _idle_movie->currentImage();
     }
     if (_is_attacked_count > 0) {
-        convertToRedImage(image);
+        convertToRedImage(image, _is_attacked_count);
         _is_attacked_count--;
     }
     painter.drawImage(QRect(-50, -100, 200, 200), image);
