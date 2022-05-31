@@ -38,8 +38,11 @@ public:
     QString getID() const; //* 返回 QString 数据
     QPair<size_t, size_t> showID() const { return _id; } //* 返回 id 本身
 
+    void paintAttackArea();
+
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
+    void paintEvent(QPaintEvent* event) override;
 
 protected:
     GameState* _gamestate;
@@ -47,6 +50,7 @@ protected:
     QVector<Infected*> _reunions;
     QPair<size_t, size_t> _id;
     QPoint _prees_point;
+    bool _isPainted;
 };
 
 //************* Place 有三个子类：不可到达的地块、低地、高地 *************

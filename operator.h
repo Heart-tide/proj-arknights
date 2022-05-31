@@ -36,6 +36,7 @@ public:
 
     void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent*) override;
+    void mouseReleaseEvent(QMouseEvent*) override;
 
 protected:
     Orientation _orientation;

@@ -2,6 +2,7 @@
 #include <QImage>
 #include <QLabel>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QPixmap>
 
 extern void deployOperator(GameState* gamestate, Place* place, int orientation);
@@ -11,6 +12,7 @@ Place::Place(GameState* gamestate, QWidget* parent)
     , _gamestate(gamestate)
     , _op(nullptr)
     , _id(QPair<size_t, size_t>(0, 0))
+    , _isPainted(false)
 {
 }
 
@@ -56,6 +58,12 @@ QString Place::getID() const
         + "," + QString::number(_id.first) + "]";
 }
 
+void Place::paintAttackArea()
+{
+    _isPainted = !_isPainted;
+    update();
+}
+
 void Place::mousePressEvent(QMouseEvent* event)
 {
     //? 小心生成了但没进 map 的格子，它们也占空间！！！
@@ -86,6 +94,16 @@ void Place::mouseReleaseEvent(QMouseEvent* event)
         } else {
             deployOperator(_gamestate, this, 0);
         }
+    }
+}
+
+void Place::paintEvent(QPaintEvent*)
+{
+    if (_isPainted) {
+        QPainter painter(this);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QBrush(Qt::blue, Qt::FDiagPattern));
+        painter.drawRect(0, 0, 100, 100);
     }
 }
 
