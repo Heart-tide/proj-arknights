@@ -81,15 +81,21 @@ void Operator::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
     //* 画干员
+    QImage image;
     if (_is_attacking) {
         _attack_movie->start();
         _idle_movie->stop();
-        painter.drawPixmap(-50, -70, 200, 200, _attack_movie->currentPixmap());
+        image = _attack_movie->currentImage();
     } else {
         _idle_movie->start();
         _attack_movie->stop();
-        painter.drawPixmap(-50, -70, 200, 200, _idle_movie->currentPixmap());
+        image = _idle_movie->currentImage();
     }
+    if (_is_attacked_count > 0) {
+        convertToRedImage(image);
+        _is_attacked_count--;
+    }
+    painter.drawImage(QRect(-50, -70, 200, 200), image);
     //* 画血条
     QBrush red_brush(QColor("#EE0000"));
     painter.setBrush(red_brush);

@@ -36,6 +36,8 @@ public:
     void timerEvent(QTimerEvent*) override;
 
 protected:
+    void convertToRedImage(QImage& img);
+
     int _health;
     const int _max_health;
     int _damage;
@@ -53,6 +55,7 @@ protected:
     QMovie* _idle_movie;
     QMovie* _attack_movie;
     bool _is_attacking;
+    int _is_attacked_count; //* 受攻击状态（变红）帧数的倒数
 };
 
 #endif // INFECTED_H
