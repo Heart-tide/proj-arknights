@@ -15,6 +15,8 @@ public:
         Place* place, size_t deployment_time, size_t id, QWidget* parent,
         QMovie* idle_movie, QMovie* attack_movie);
 
+    virtual ~Infected();
+
     void reduceHealth(int damage);
     void increaseHealth(int damage);
     virtual void attack(Infected*) = 0;

@@ -97,7 +97,7 @@ void Reunion::paintEvent(QPaintEvent*)
 //* 将对整合运动的鼠标点击传递给其所在的地面
 void Reunion::mousePressEvent(QMouseEvent* event)
 {
-    printLog("#cc9900", QString("%0").arg(getName()), QString("{ATT}%1 {DEF}%2").arg(_damage).arg(_defense));
+    printLog("#9999ff", QString("%0").arg(getName()), QString("{ATT}%1 {DEF}%2").arg(_damage).arg(_defense));
     return _place->mousePressEvent(event);
 }
 

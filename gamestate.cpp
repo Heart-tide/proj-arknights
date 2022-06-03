@@ -127,6 +127,7 @@ void GameState::operatorAction()
             (*it)->action(_time);
             it++; //? 不删除元素时，正常递增迭代器
         } else {
+            (*it)->removeFrom();
             delete (*it);
             it = _active_operators.erase(it); //? 删除元素后，指向它的迭代器失效，故将其指向下一个元素
         }
@@ -234,6 +235,7 @@ void GameState::reunionAction()
             (*it)->action(_time, _hp, properAttackedOperator(*it), _map);
             it++;
         } else {
+            (*it)->removeFrom();
             delete (*it);
             it = _active_reunions.erase(it);
         }

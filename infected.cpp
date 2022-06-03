@@ -25,16 +25,19 @@ Infected::Infected(size_t health, int damage, int defense, size_t interval,
     startTimer(20);
 }
 
+Infected::~Infected()
+{
+    delete _idle_movie;
+    delete _attack_movie;
+}
+
 void Infected::reduceHealth(int damage)
 {
     int true_damage = max<double>(0.1 * damage, damage - _defense); //* 实际受到的伤害
     _health -= true_damage;
     if (_health <= 0) {
-        removeFrom();
         _is_active = false;
-        //* 若死亡，直接释放资源，减少卡顿
-        delete _idle_movie;
-        delete _attack_movie;
+        hide();
     }
     _is_attacked_count = 10; //* 持续 200ms
 }

@@ -136,12 +136,10 @@ void Operator::mousePressEvent(QMouseEvent* event)
         for (Place*& place : _attack_places) {
             place->paintAttackArea();
         }
-    } else if (event->button() == Qt::RightButton && !_gamestate->isGameOver() && !_gamestate->isPaused()) {
+    } else if (event->button() == Qt::RightButton) {
         _gamestate->getDeploymentPoint() += getCost() / 2;
-        removeFrom();
         _is_active = false;
-        delete _idle_movie;
-        delete _attack_movie;
+        hide();
     }
 }
 
