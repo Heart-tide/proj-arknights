@@ -34,6 +34,7 @@ public:
     virtual int getBlock() const { return 0; }
     int getDefense() const { return _defense; }
     bool isActive() const { return _is_active; }
+    virtual QString getSkill() const = 0;
 
     void paintEvent(QPaintEvent*) = 0;
     void timerEvent(QTimerEvent*) override;

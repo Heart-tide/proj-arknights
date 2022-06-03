@@ -63,6 +63,7 @@ public:
 
     QString getName() const override { return "Yuan"; }
     int getAttackArea() const override { return 0; }
+    QString getSkill() const override { return "原石虫，很可爱！"; }
 };
 
 class Soldier : public GroundReunion {
@@ -73,6 +74,7 @@ public:
 
     QString getName() const override { return "Soldier"; }
     int getAttackArea() const override { return 1; }
+    QString getSkill() const override { return "可以进行远程攻击，恋战"; }
 };
 
 class Revenger : public GroundReunion {
@@ -83,6 +85,7 @@ public:
 
     QString getName() const override { return "Revenger"; }
     int getAttackArea() const override { return 0; }
+    QString getSkill() const override { return "血量低于50%时攻击力加倍"; }
 
     void attack(Infected* op) override;
 
@@ -98,6 +101,7 @@ public:
 
     QString getName() const override { return "Defender"; }
     int getAttackArea() const override { return 0; }
+    QString getSkill() const override { return "不进行攻击，极端恋战"; }
 
     void action(size_t, size_t& hp, Infected* op, Map* map) override;
 };
@@ -126,6 +130,7 @@ public:
 
     QString getName() const override { return "Monster"; }
     int getAttackArea() const override { return 1; }
+    QString getSkill() const override { return "飞行单位，畏战"; }
 };
 
 #endif // REUNION_H

@@ -61,10 +61,8 @@ void Reunion::move(size_t& hp, Map* map)
 //* 攻击！
 void Reunion::attack(Infected* op)
 {
-    // auto op_place = op->getPlace(); //* 提前保存干员所在地块，不然一会受击死亡后就找不到了
     op->reduceHealth(_damage);
     if (!op->isActive()) {
-        // printLog("#ff9933", "KILL", QString("%1%2 --> %3%4").arg(getName()).arg(_place->getID()).arg(op->getName()).arg(op_place->getID()));
         op->hide();
     }
 }
@@ -98,6 +96,7 @@ void Reunion::paintEvent(QPaintEvent*)
 void Reunion::mousePressEvent(QMouseEvent* event)
 {
     printLog("#9999ff", QString("%0").arg(getName()), QString("{ATT}%1 {DEF}%2").arg(_damage).arg(_defense));
+    printLog("#000000", QString("{ABOUT}"), QString("%1").arg(getSkill()));
     return _place->mousePressEvent(event);
 }
 

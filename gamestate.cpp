@@ -2,8 +2,6 @@
 #include "ui_map.h"
 #include <QDialog>
 
-using std::function;
-
 GameState::GameState(size_t reunion_stats, size_t create_intervel, size_t total_hp, size_t default_dp, QWidget* parent)
     : QWidget(parent)
     , _map(new Map(this, this))

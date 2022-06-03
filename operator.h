@@ -28,7 +28,6 @@ public:
     Orientation getOrientation() const { return _orientation; }
     //* 假设向右部署，干员的矩形攻击范围的 height, width 大小
     virtual QPair<int, int> getAttackArea() const { return QPair<int, int>(1, 1); }
-    virtual QString getSkill() const = 0;
 
     virtual bool isGroundToAir() const { return false; }
 
@@ -72,7 +71,7 @@ public:
 
     size_t getCost() const override { return cost; }
     QString getName() const override { return "Kroos"; }
-    QString getSkill() const override { return "每次攻击有 1/3 的概率双击"; }
+    QString getSkill() const override { return "每次攻击有 1/3 的概率连击"; }
 
     //* 将 cost 设计成静态成员，以便在不创建对象的前提下，直接用类名进行引用
     static constexpr size_t cost = 14;
@@ -122,7 +121,7 @@ public:
     QString getName() const override { return "Skadi"; }
     int getBlock() const override { return 0; }
     QPair<int, int> getAttackArea() const override { return QPair<int, int>(2, 2); }
-    QString getSkill() const override { return "部署前20s攻击力增加100%"; }
+    QString getSkill() const override { return "部署后20s内攻击力增加100%"; }
 
     static constexpr size_t cost = 18;
 
