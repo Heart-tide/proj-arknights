@@ -176,16 +176,15 @@ void GameState::findAttackPlaces(Operator* op) const
 //* 生成 Reunion
 void GameState::reunionStragegy()
 {
-    //* 前 7s 不出怪
-    if (_time < 350) {
-        return;
-    }
+    static size_t last_create_time = 0;
     //* 若无任何路径，则进入地图编辑器模式，不出怪
     if ((_map->_routes[false].empty()) && (_map->_routes[true].empty())) {
         return;
     }
-    if (_time % _create_interval != 1 || _enemy_stats == 0)
+    if (_time < last_create_time + _create_interval || _enemy_stats == 0)
         return;
+    last_create_time = _time;
+    _create_interval -= 5; //* 每次生成 Reunion 都会减少生成时间
     _enemy_stats--;
     auto reunion = createRandomReunion();
     _active_reunions.push_back(reunion);

@@ -288,7 +288,7 @@ void Irene::attack(Infected* attacked)
 
 Skadi::Skadi(LowerPlace* lower_place, size_t deployment_time,
     size_t id, QWidget* parent, Orientation orientation)
-    : Guard(294, 168, 22, 75, lower_place, deployment_time, id, parent, orientation,
+    : Guard(54, 168, 22, 75, lower_place, deployment_time, id, parent, orientation,
         new QMovie("://res/operator/Skadi-idle.gif"),
         new QMovie("://res/operator/Skadi-attack.gif"))
     , _attack_doubled(true)

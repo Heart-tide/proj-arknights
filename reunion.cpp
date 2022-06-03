@@ -241,7 +241,7 @@ void UAV::paintEvent(QPaintEvent* event)
 }
 
 Yuan::Yuan(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(105, 20, 0, 85, deployment_time, 2, id, route, parent,
+    : GroundReunion(205, 30, 0, 85, deployment_time, 2, id, route, parent,
         new QMovie("://res/reunion/yuan-idle.gif"),
         new QMovie("://res/reunion/yuan-attack.gif")) //* 源石虫攻击力限时 UP 已结束 !
 {
@@ -255,7 +255,7 @@ Soldier::Soldier(size_t deployment_time, size_t id, QVector<Place*> route, QWidg
 }
 
 Revenger::Revenger(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(500, 30, 20, 115, deployment_time, 1.3, id, route, parent,
+    : GroundReunion(500, 65, 25, 115, deployment_time, 1.3, id, route, parent,
         new QMovie("://res/reunion/revenger-idle.gif"),
         new QMovie("://res/reunion/revenger-attack.gif"))
     , _low_health(false)

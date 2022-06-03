@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
     setWindowTitle("Arknights");
-    //* 每 150 * 0.02s = 3s 出一个怪
-    auto gamestate = new GameState(50, 150, 5, 13, this);
+    //* 每 400 * 0.02s = 8s 出一个怪
+    auto gamestate = new GameState(50, 300, 5, 13, this);
     setFixedSize(gamestate->size());
 }
 
