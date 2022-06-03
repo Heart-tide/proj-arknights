@@ -90,6 +90,18 @@ private:
     bool _low_health;
 };
 
+class Defender : public GroundReunion {
+    Q_OBJECT
+
+public:
+    Defender(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent);
+
+    QString getName() const override { return "Defender"; }
+    int getAttackArea() const override { return 0; }
+
+    void action(size_t, size_t& hp, Infected* op, Map* map) override;
+};
+
 //************* 无人机 *************
 class UAV : public Reunion {
     Q_OBJECT

@@ -28,15 +28,15 @@ void Map::connectOperators()
 {
     connect(ui->photo_irene, &QPushButton::clicked, this, [=]() {
         _operatorSelected = 0;
-        printLog("#cc00cc", "CHOOSE", "Irene");
     });
     connect(ui->photo_kroos, &QPushButton::clicked, this, [=]() {
         _operatorSelected = 1;
-        printLog("#cc00cc", "CHOOSE", "Kroos");
     });
     connect(ui->photo_honey_berry, &QPushButton::clicked, this, [=]() {
         _operatorSelected = 2;
-        printLog("#cc00cc", "CHOOSE", "HoneyBerry");
+    });
+    connect(ui->photo_skadi, &QPushButton::clicked, this, [=]() {
+        _operatorSelected = 3;
     });
 }
 
@@ -46,7 +46,7 @@ void Map::arrangeUiWidgets()
     auto width = getWidth();
     auto height = getHeight();
     //* 1. log, speed and pause
-    ui->text_log->setGeometry(10, height * 100 + 10, 320, 80);
+    ui->text_log->setGeometry(10, height * 100 + 10, 280, 80);
     ui->push_speed->setGeometry(width * 100 - 70, 20, 40, 40);
     ui->push_pause->setGeometry(width * 100 - 130, 20, 40, 40);
     //* 2. dp, enemy stats and hp
@@ -58,8 +58,9 @@ void Map::arrangeUiWidgets()
     ui->label_hp->setGeometry(static_cast<float>(width) / 2 * 100 + 50, 17, 30, 20);
     //* 3. photos of operators
     ui->photo_irene->setGeometry((width - 1) * 100, height * 100, 100, 100);
-    ui->photo_kroos->setGeometry((width - 2) * 100, height * 100, 100, 100);
+    ui->photo_skadi->setGeometry((width - 2) * 100, height * 100, 100, 100);
     ui->photo_honey_berry->setGeometry((width - 3) * 100, height * 100, 100, 100);
+    ui->photo_kroos->setGeometry((width - 4) * 100, height * 100, 100, 100);
 }
 
 //* 读取在 map 文件夹下的所有地图文件

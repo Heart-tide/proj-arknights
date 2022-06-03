@@ -30,6 +30,7 @@ public:
     Place* getPlace() const { return _place; }
     bool isHealthReduced() const { return _health < _max_health; }
     virtual int getBlock() const { return 0; }
+    int getDefense() const { return _defense; }
     bool isActive() const { return _is_active; }
 
     void paintEvent(QPaintEvent*) = 0;

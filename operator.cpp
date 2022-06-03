@@ -1,5 +1,7 @@
 #include "operator.h"
+#include "gamestate.h"
 #include "reunion.h"
+#include <QMouseEvent>
 
 Operator::Operator(size_t health,
     int damage,
@@ -15,6 +17,8 @@ Operator::Operator(size_t health,
     : Infected(health, damage, defense, interval, place,
         deployment_time, id, parent, idle_movie, attack_movie)
     , _orientation(orientation)
+    , _gamestate(place->getGameState())
+    , _is_skill_used(false)
 {
     //? 要show才能调用绘图事件！！！
     show();
@@ -27,14 +31,11 @@ void Operator::action(size_t time)
         return;
     }
     Infected* attacked = findAttacked();
-    if (attacked) { //* 暂时无视阻挡数要求
+    if (attacked) {
         _is_attacking = true;
         _last_action_time = time;
-        // auto attacked_place = attacked->getPlace();
         attack(attacked);
         if (!attacked->isActive()) {
-            // C++ 11 的 Raw String Literals，有助于更方便地书写字符串字面量：R"(……)"，中间可加换行
-            // printLog("#ee0000", "KILL", QString("%1%2 --> %3%4").arg(getName()).arg(_place->getID()).arg(attacked->getName()).arg(attacked_place->getID()));
             attacked->hide();
         }
     } else {
@@ -76,7 +77,6 @@ Infected* Operator::findAttacked() const
     return nullptr;
 }
 
-//* 把干员的朝向显示出来
 void Operator::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
@@ -101,6 +101,12 @@ void Operator::paintEvent(QPaintEvent*)
     painter.setBrush(red_brush);
     float rate = 1.0 * _health / _max_health;
     painter.drawRect(15, 5, rate * 80, 5);
+    //* 技能发动显示
+    if (_is_skill_used) {
+        QBrush blue_brush(QColor("#0000EE"));
+        painter.setBrush(blue_brush);
+        painter.drawRect(90, 10, 5, 5);
+    }
     //* 说明血量
     painter.setPen(QPen(Qt::green, 5));
     painter.drawText(15, 10, QString::number(_health) + " / " + QString::number(_max_health));
@@ -121,20 +127,30 @@ void Operator::paintEvent(QPaintEvent*)
     }
 }
 
-//* 展示我方干员的状态
-void Operator::mousePressEvent(QMouseEvent*)
+//* 展示我方干员的状态，或撤退我方干员
+void Operator::mousePressEvent(QMouseEvent* event)
 {
-    printLog("#cc9900", QString("%0").arg(getName()), QString("{HP}%1 {ATT}%2 {DEF}%3").arg(_health).arg(_damage).arg(_defense));
-    printLog("#ffffff", QString("%0").arg(getName()), QString("{ATTSPD}%1 {BLK}%2").arg(0.02 * _interval).arg(getBlock()));
-    for (Place*& place : _attack_places) {
-        place->paintAttackArea();
+    if (event->button() == Qt::LeftButton) {
+        printLog("#cc9900", QString("%0").arg(getName()), QString("{ATT}%1 {DEF}%2 {BLK}%3").arg(_damage).arg(_defense).arg(getBlock()));
+        printLog("#000000", QString("{SKILL}"), QString("%1").arg(getSkill()));
+        for (Place*& place : _attack_places) {
+            place->paintAttackArea();
+        }
+    } else if (event->button() == Qt::RightButton && !_gamestate->isGameOver() && !_gamestate->isPaused()) {
+        _gamestate->getDeploymentPoint() += getCost() / 2;
+        removeFrom();
+        _is_active = false;
+        delete _idle_movie;
+        delete _attack_movie;
     }
 }
 
-void Operator::mouseReleaseEvent(QMouseEvent*)
+void Operator::mouseReleaseEvent(QMouseEvent* event)
 {
-    for (Place*& place : _attack_places) {
-        place->paintAttackArea();
+    if (event->button() == Qt::LeftButton) {
+        for (Place*& place : _attack_places) {
+            place->paintAttackArea();
+        }
     }
 }
 
@@ -214,6 +230,31 @@ HoneyBerry::HoneyBerry(HigherPlace* higher_place, size_t deployment_time,
 {
 }
 
+void HoneyBerry::action(size_t time)
+{
+    if (_is_active == false || (time - _last_action_time) < _interval) {
+        return;
+    }
+    Infected* attacked = findAttacked();
+    srand(static_cast<unsigned>(clock()));
+    if (attacked) {
+        _is_attacking = true;
+        _last_action_time = time;
+        attack(attacked);
+        if (rand() % 5 == 0) {
+            Infected* attacked = findAttacked();
+            if (attacked) {
+                attack(attacked);
+            }
+            _is_skill_used = true;
+        } else {
+            _is_skill_used = false;
+        }
+    } else {
+        _is_attacking = false;
+    }
+}
+
 Irene::Irene(LowerPlace* lower_place,
     size_t deployment_time,
     size_t id,
@@ -227,10 +268,44 @@ Irene::Irene(LowerPlace* lower_place,
 
 void Irene::attack(Infected* attacked)
 {
-    attacked->reduceHealth(_damage);
-    if (attacked->isActive()) {
+    srand(static_cast<unsigned>(clock()));
+    int half_of_attacked_defense = attacked->getDefense() / 2;
+    bool use_skill = false;
+    if (rand() % 2 == 0) {
+        attacked->reduceHealth(_damage + half_of_attacked_defense);
+        use_skill = true;
+    } else {
         attacked->reduceHealth(_damage);
     }
+    if (attacked->isActive()) {
+        if (rand() % 2 == 0) {
+            attacked->reduceHealth(_damage + half_of_attacked_defense);
+            use_skill = true;
+        } else {
+            attacked->reduceHealth(_damage);
+        }
+    }
+    _is_skill_used = use_skill;
+}
+
+Skadi::Skadi(LowerPlace* lower_place, size_t deployment_time,
+    size_t id, QWidget* parent, Orientation orientation)
+    : Guard(294, 168, 22, 75, lower_place, deployment_time, id, parent, orientation,
+        new QMovie("://res/operator/Skadi-idle.gif"),
+        new QMovie("://res/operator/Skadi-attack.gif"))
+    , _attack_doubled(true)
+{
+    _is_skill_used = true;
+}
+
+void Skadi::action(size_t time)
+{
+    if (_attack_doubled && time - _deployment_time > 1000) {
+        _attack_doubled = false;
+        _damage /= 2;
+        _is_skill_used = false;
+    }
+    Operator::action(time);
 }
 
 Kroos::Kroos(HigherPlace* higher_place,
@@ -242,4 +317,18 @@ Kroos::Kroos(HigherPlace* higher_place,
         new QMovie("://res/operator/Kroos-idle.gif"),
         new QMovie("://res/operator/Kroos-attack.gif"))
 {
+}
+
+void Kroos::attack(Infected* attacked)
+{
+    srand(static_cast<unsigned>(clock()));
+    attacked->reduceHealth(_damage);
+    if (rand() % 3 == 0) {
+        if (attacked->isActive()) {
+            attacked->reduceHealth(_damage);
+        }
+        _is_skill_used = true;
+    } else {
+        _is_skill_used = false;
+    }
 }

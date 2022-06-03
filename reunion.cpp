@@ -50,7 +50,6 @@ void Reunion::move(size_t& hp, Map* map)
             chooseDirection();
         }
         if (_route.empty()) {
-            printLog("#ff9933", "BASE", QString("HP %2 -> %3").arg(hp).arg(hp - 1));
             _is_active = false;
             if (--hp == 0) {
                 throw LoseGameException();
@@ -98,8 +97,7 @@ void Reunion::paintEvent(QPaintEvent*)
 //* 将对整合运动的鼠标点击传递给其所在的地面
 void Reunion::mousePressEvent(QMouseEvent* event)
 {
-    printLog("#cc9900", QString("%0").arg(getName()), QString("{ATT}%1 {DEF}%2 {AREA}%3*%3").arg(_damage).arg(_defense).arg(2 * getAttackArea() + 1));
-    printLog("#ffffff", QString("%0").arg(getName()), QString("{ATTSPD}%1 {MOVSPD}%2").arg(0.02 * _interval).arg(_move_speed));
+    printLog("#cc9900", QString("%0").arg(getName()), QString("{ATT}%1 {DEF}%2").arg(_damage).arg(_defense));
     return _place->mousePressEvent(event);
 }
 
@@ -243,14 +241,14 @@ void UAV::paintEvent(QPaintEvent* event)
 }
 
 Yuan::Yuan(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(55, 13, 0, 85, deployment_time, 2, id, route, parent,
+    : GroundReunion(105, 20, 0, 85, deployment_time, 2, id, route, parent,
         new QMovie("://res/reunion/yuan-idle.gif"),
         new QMovie("://res/reunion/yuan-attack.gif")) //* 源石虫攻击力限时 UP 已结束 !
 {
 }
 
 Soldier::Soldier(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
-    : GroundReunion(140, 24, 10, 120, deployment_time, 1.8, id, route, parent,
+    : GroundReunion(185, 31, 10, 120, deployment_time, 1.8, id, route, parent,
         new QMovie("://res/reunion/soldier-idle.gif"),
         new QMovie("://res/reunion/soldier-attack.gif"))
 {
@@ -271,6 +269,21 @@ void Revenger::attack(Infected* op)
         _damage *= 2;
     }
     Reunion::attack(op);
+}
+
+Defender::Defender(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)
+    : GroundReunion(600, 0, 80, 130, deployment_time, 1.5, id, route, parent,
+        new QMovie("://res/reunion/defender-idle.gif"),
+        new QMovie("://res/reunion/defender-idle.gif"))
+{
+}
+
+void Defender::action(size_t, size_t& hp, Infected* op, Map* map)
+{
+    //* 极端恋战，优先让其他整合运动部队越过我方单位
+    if (op == nullptr || op->getBlock() == 0) {
+        move(hp, map);
+    }
 }
 
 Monster::Monster(size_t deployment_time, size_t id, QVector<Place*> route, QWidget* parent)

@@ -175,8 +175,8 @@ font: 75 14pt &quot;Berlin Sans FB Demi&quot;;</string>
   <widget class="QPushButton" name="photo_kroos">
    <property name="geometry">
     <rect>
-     <x>500</x>
-     <y>499</y>
+     <x>300</x>
+     <y>500</y>
      <width>100</width>
      <height>100</height>
     </rect>
@@ -196,7 +196,7 @@ font: 75 14pt &quot;Berlin Sans FB Demi&quot;;</string>
     <rect>
      <x>10</x>
      <y>510</y>
-     <width>321</width>
+     <width>291</width>
      <height>81</height>
     </rect>
    </property>
@@ -219,7 +219,7 @@ font: 75 14pt &quot;Berlin Sans FB Demi&quot;;</string>
   <widget class="QPushButton" name="photo_honey_berry">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>400</x>
      <y>500</y>
      <width>100</width>
      <height>100</height>
@@ -227,6 +227,25 @@ font: 75 14pt &quot;Berlin Sans FB Demi&quot;;</string>
    </property>
    <property name="styleSheet">
     <string notr="true">image: url(:/res/photo/HoneyBerry.png);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="photo_skadi">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>500</y>
+     <width>100</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">image: url(:/res/photo/Skadi.png);</string>
    </property>
    <property name="text">
     <string/>

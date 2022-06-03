@@ -32,9 +32,10 @@ public:
     virtual bool isEntrance() { return false; }
     virtual bool isLower() { return false; }
     virtual bool isHigher() { return false; }
-
+    GameState* getGameState() { return _gamestate; }
     Infected* getOperator() { return _op; }
     QVector<Infected*>& getReunions() { return _reunions; }
+
     QString getID() const; //* 返回 QString 数据
     QPair<size_t, size_t> showID() const { return _id; } //* 返回 id 本身
 

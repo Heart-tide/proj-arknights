@@ -33,10 +33,8 @@ void GameState::connectWithWidgets()
     connect(ui->push_speed, &QPushButton::clicked, this, [=]() {
         if (_speed == 1) {
             ui->push_speed->setStyleSheet("image: url(:/res/photo/speed_2x.png);");
-            printLog("#9999ff", "SPEED", "UP");
         } else {
             ui->push_speed->setStyleSheet("image: url(:/res/photo/speed_1x.png);");
-            printLog("#9999ff", "SPEED", "DOWN");
         }
         _speed = 3 - _speed;
         _timer->setInterval(20 / _speed);
@@ -44,7 +42,6 @@ void GameState::connectWithWidgets()
     connect(ui->push_pause, &QPushButton::clicked, this, [=]() {
         if (_timer->isActive()) {
             ui->push_pause->setStyleSheet("image: url(:/res/photo/continue.png);");
-            printLog("#9999ff", "TIME", "PAUSE");
             _timer->stop();
             //* 停止所有对象的攻击动作
             for (auto it = _active_operators.begin(); it < _active_operators.end(); it++) {
@@ -55,7 +52,6 @@ void GameState::connectWithWidgets()
             }
         } else if (!_timer->isActive() && !_gameover) {
             ui->push_pause->setStyleSheet("image: url(:/res/photo/stop.png);");
-            printLog("#9999FF", "TIME", "CONTINUE");
             _timer->start();
         }
     });
@@ -107,6 +103,11 @@ void GameState::deployOperator(size_t choice, Place* place, Orientation orientat
             op = new HoneyBerry(dynamic_cast<HigherPlace*>(place), _time, id_counter++, this, orientation);
         }
         break;
+    case 3:
+        if (Skadi::cost <= _dp) {
+            op = new Skadi(dynamic_cast<LowerPlace*>(place), _time, id_counter++, this, orientation);
+        }
+        break;
     }
     if (op == nullptr) {
         return;
@@ -115,7 +116,6 @@ void GameState::deployOperator(size_t choice, Place* place, Orientation orientat
     findAttackPlaces(op); //* 设置该干员的攻击范围
     _dp -= op->getCost();
     _active_operators.push_back(op);
-    printLog("#33cccc", "DEPLOY", QString("%1 %2").arg(op->getName()).arg(op->getPlace()->getID()));
 }
 
 //* 场上所有 active 的 operator 按其生成次序行动
@@ -147,14 +147,14 @@ void GameState::findAttackPlaces(Operator* op) const
     case DOWN:
         height = op->getAttackArea().second;
         width = op->getAttackArea().first;
-        x = op->getPlace()->showID().second - width / 2;
+        x = op->getPlace()->showID().second - (width - 1) / 2; //* 若采用此算法，width 不能为奇数
         y = op->getPlace()->showID().first;
         break;
     case LEFT:
         height = op->getAttackArea().first;
         width = op->getAttackArea().second;
         x = op->getPlace()->showID().second - (width - 1);
-        y = op->getPlace()->showID().first - height / 2;
+        y = op->getPlace()->showID().first - (height - 1) / 2;
         break;
     case RIGHT:
         height = op->getAttackArea().first;
@@ -196,10 +196,12 @@ Reunion* GameState::createRandomReunion()
 {
     static size_t id_counter = 0;
     srand(static_cast<unsigned>(clock()));
-    size_t choice = rand() % 10;
+    size_t choice = rand();
     //* 若无空中路径，仅生成地面敌人
-    if (choice >= 7 && _map->_routes[true].empty()) {
-        choice %= 7;
+    if (_map->_routes[true].empty()) {
+        choice %= 8;
+    } else {
+        choice %= 11;
     }
     //* 地面敌人在前，空中敌人在后
     switch (choice) {
@@ -214,8 +216,10 @@ Reunion* GameState::createRandomReunion()
     case 6:
         return new Revenger(_time, id_counter++, getRandomUnit(_map->_routes[false]), this);
     case 7:
+        return new Defender(_time, id_counter++, getRandomUnit(_map->_routes[false]), this);
     case 8:
     case 9:
+    case 10:
         return new Monster(_time, id_counter++, getRandomUnit(_map->_routes[true]), this);
     default:
         return nullptr;
@@ -267,6 +271,7 @@ void deployOperator(GameState* gamestate, Place* place, int orientation)
     case -1:
         return;
     case 0:
+    case 3:
         if (place->isLower()) {
             gamestate->deployOperator(choice, place, static_cast<Orientation>(orientation));
         }

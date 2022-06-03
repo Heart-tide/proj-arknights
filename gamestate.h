@@ -21,6 +21,9 @@ public:
     void deployOperator(size_t choice, Place* place, Orientation orientation);
     void operatorAction();
     void findAttackPlaces(Operator* op) const;
+    size_t& getDeploymentPoint() { return _dp; }
+    bool isGameOver() const { return _gameover; }
+    bool isPaused() const { return !_timer->isActive(); }
 
     void reunionStragegy();
     Reunion* createRandomReunion();
