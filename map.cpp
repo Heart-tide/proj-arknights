@@ -67,7 +67,7 @@ void Map::arrangeUiWidgets()
 void Map::loadMap()
 {
     //* currentPath 指出 exe 文件所在目录，QStringList("map-*.txt")过滤出所有地图文件
-    QDir map_dir(QDir::currentPath() + "/../res/map");
+    QDir map_dir(QDir::currentPath() + "/map");
     QList<QFileInfo> fileInfo(map_dir.entryInfoList(QStringList("map-*.txt")));
     //* 从已有地图中，随机选取一张地图执行
     srand(static_cast<unsigned>(time(nullptr)));
