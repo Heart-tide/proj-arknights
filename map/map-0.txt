@@ -19,4 +19,4 @@
 0 5
 4 0 1 0 1 4 0 4 0 6
 
-# copy from Arknights S2-8
+# Arknights S2-8
